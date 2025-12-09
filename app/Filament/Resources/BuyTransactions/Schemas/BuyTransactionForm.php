@@ -40,7 +40,6 @@ class BuyTransactionForm
 
 
                 Repeater::make('items')
-                    ->relationship()
                     ->dehydrated()
                     ->schema([
                         Grid::make(12)->schema([
@@ -67,19 +66,24 @@ class BuyTransactionForm
 
                         TextInput::make('currency_code')
                             ->disabled()
+                            ->dehydrated()
                             ->label('Code'),
 
                         TextInput::make('buy_rate')
                             ->disabled()
                             ->numeric()
+                            ->dehydrated()
                               ->columnSpan(2)
                             ->label('Buy Rate'),
 
                         TextInput::make('qty')
                             ->label('Qty')
+                            
+                              ->dehydrated()
                             ->numeric()
                               ->columnSpan(2)
                             ->reactive()
+
                             ->afterStateUpdated(function ($state, $set, $get) {
                                 $set('total', $get('buy_rate') * $state);
                                 BuyTransactionForm::updateParentTotal($get, $set);
@@ -88,22 +92,23 @@ class BuyTransactionForm
                         TextInput::make('total')
                             ->label('Total')
                               ->columnSpan(2)
+                              ->dehydrated()
                             ->numeric()
                             ->disabled(),
                         ])
                     ])
                     ->columns(1)
-    ->columnSpan('full')
- ->afterStateUpdated(function (callable $get, callable $set) {
-        BuyTransactionForm::updateParentTotal($get, $set);
-    })
-            ]);
-    }
+            ->columnSpan('full')
+        ->afterStateUpdated(function (callable $get, callable $set) {
+                BuyTransactionForm::updateParentTotal($get, $set);
+            })
+                    ]);
+            }
 
     public static function updateParentTotal($get, $set)
-{
-    $items = collect($get('items'));
-    $total = $items->sum('total');
-    $set('total_amount', $total);
-}
+    {
+        $items = collect($get('items'));
+        $total = $items->sum('total');
+        $set('total_amount', $total);
+    }
 }
