@@ -16,17 +16,15 @@ return new class extends Migration
             $table->foreignId('buy_transaction_id')
                 ->constrained('buy_transactions')
                 ->cascadeOnDelete();
-
             $table->foreignId('currency_id')->constrained('currencies');
-
             // Flatten data mata uang saat transaksi
             $table->string('currency_code', 5);
             $table->string('currency_name');
             $table->string('currency_flag')->nullable();
 
-            $table->decimal('nominal_foreign', 18, 2);
-            $table->decimal('currency_rate', 18, 2);
-            $table->decimal('subtotal_idr', 18, 2);
+            $table->decimal('buy_rate', 18, 2);
+            $table->decimal('qty', 18, 2);
+            $table->decimal('total', 18, 2);
 
             $table->timestamps();
         });

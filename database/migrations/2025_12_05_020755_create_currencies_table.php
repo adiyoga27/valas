@@ -16,6 +16,8 @@ return new class extends Migration
             $table->string('code', 5); // USD, JPY
             $table->string('name');
             $table->string('flag')->nullable(); // /flags/us.png
+            $table->decimal('buy_rate', 18, 2)->default(0.0);   // Customer jual
+            $table->decimal('sell_rate', 18, 2)->default(0.0);  // Customer beli
             $table->boolean('is_active')->default(true);
             $table->timestamps();
         });

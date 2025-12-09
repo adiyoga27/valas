@@ -6,10 +6,10 @@ use Illuminate\Database\Eloquent\Model;
 
 class Currency extends Model
 {
-    protected $fillable = ['code','name','flag','is_active'];
+    protected $fillable = ['code','name','flag','buy_rate','sell_rate','is_active'];
 
-    public function rates()
+    public function getDisplayNameAttribute()
     {
-        return $this->hasMany(CurrencyRate::class);
+        return "{$this->code} - {$this->name}";
     }
 }

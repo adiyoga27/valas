@@ -22,8 +22,14 @@ class CurrenciesTable
                 TextColumn::make('name')
                     ->searchable(),
                 ImageColumn::make('flag')->label('Flag')
-    ->size(40)
-    ->disk('public'),
+                ->size(40)
+                ->disk('public'),
+                TextColumn::make('buy_rate')
+                    ->formatStateUsing(fn ($state) => number_format($state, 2, ',', '.'))
+                    ->sortable(),
+                    TextColumn::make('sell_rate')
+                    ->formatStateUsing(fn ($state) => number_format($state, 2, ',', '.'))
+                    ->sortable(),
                 IconColumn::make('is_active')
                     ->boolean(),
                 TextColumn::make('created_at')
@@ -39,13 +45,13 @@ class CurrenciesTable
                 //
             ])
             ->recordActions([
-                ViewAction::make(),
+                // ViewAction::make(),
                 EditAction::make(),
             ])
             ->toolbarActions([
                 BulkActionGroup::make([
                     DeleteBulkAction::make(),
                 ]),
-            ]);
+            ])->defaultSort('is_active', 'desc');
     }
 }
