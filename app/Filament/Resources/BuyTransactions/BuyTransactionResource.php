@@ -5,6 +5,8 @@ namespace App\Filament\Resources\BuyTransactions;
 use App\Filament\Resources\BuyTransactions\Pages\CreateBuyTransaction;
 use App\Filament\Resources\BuyTransactions\Pages\EditBuyTransaction;
 use App\Filament\Resources\BuyTransactions\Pages\ListBuyTransactions;
+use App\Filament\Resources\BuyTransactions\Pages\PrintBuyTransaction;
+use App\Filament\Resources\BuyTransactions\Pages\ViewBuyTransaction;
 use App\Filament\Resources\BuyTransactions\Schemas\BuyTransactionForm;
 use App\Filament\Resources\BuyTransactions\Tables\BuyTransactionsTable;
 use App\Models\BuyTransaction;
@@ -13,6 +15,7 @@ use Filament\Resources\Resource;
 use Filament\Schemas\Schema;
 use Filament\Support\Icons\Heroicon;
 use Filament\Tables\Table;
+use App\Filament\Resources\BuyTransactions\Schemas\BuyTransactionInfolist;
 
 class BuyTransactionResource extends Resource
 {
@@ -27,6 +30,11 @@ class BuyTransactionResource extends Resource
         return BuyTransactionForm::configure($schema);
     }
 
+    public static function infolist(Schema $schema): Schema
+    {
+        return BuyTransactionInfolist::configure($schema);
+    }
+
     public static function table(Table $table): Table
     {
         return BuyTransactionsTable::configure($table);
@@ -38,6 +46,7 @@ class BuyTransactionResource extends Resource
             'index' => ListBuyTransactions::route('/'),
             'create' => CreateBuyTransaction::route('/create'),
             'edit' => EditBuyTransaction::route('/{record}/edit'),
+            'view' => ViewBuyTransaction::route('/{record}'),
         ];
     }
 }

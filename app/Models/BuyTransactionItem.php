@@ -9,7 +9,7 @@ class BuyTransactionItem extends Model
     protected $fillable = [
         'buy_transaction_id','currency_id','currency_code',
         'currency_name','currency_flag','nominal_foreign',
-        'currency_rate','subtotal_idr'
+        'buy_rate','qty','total'
     ];
 
     public function transaction()
