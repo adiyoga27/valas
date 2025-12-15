@@ -21,7 +21,7 @@ class CurrencyResource extends Resource
     protected static ?string $model = Currency::class;
 
     protected static string|BackedEnum|null $navigationIcon = Heroicon::BookOpen;
-
+    protected static string|\UnitEnum|null $navigationGroup = 'Data Master';
     protected static ?string $recordTitleAttribute = 'Currency';
 
     public static function form(Schema $schema): Schema

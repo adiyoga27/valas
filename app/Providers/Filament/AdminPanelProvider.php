@@ -7,6 +7,7 @@ use Filament\Http\Middleware\Authenticate;
 use Filament\Http\Middleware\AuthenticateSession;
 use Filament\Http\Middleware\DisableBladeIconComponents;
 use Filament\Http\Middleware\DispatchServingFilamentEvent;
+use Filament\Navigation\NavigationGroup;
 use Filament\Pages\Dashboard;
 use Filament\Panel;
 use Filament\PanelProvider;
@@ -53,6 +54,16 @@ class AdminPanelProvider extends PanelProvider
                 DisableBladeIconComponents::class,
                 DispatchServingFilamentEvent::class,
             ])
+            ->navigationGroups([
+            NavigationGroup::make()
+                ->label('Data Master'),
+
+            NavigationGroup::make()
+                ->label('Transaksi'),
+
+            NavigationGroup::make()
+                ->label('Report'),
+        ])
             ->authMiddleware([
                 Authenticate::class,
             ]);

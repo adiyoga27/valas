@@ -21,11 +21,12 @@ class OfficeResource extends Resource
     protected static ?string $model = Office::class;
 
     protected static string|BackedEnum|null $navigationIcon = Heroicon::BuildingOffice2;
+    protected static string|\UnitEnum|null $navigationGroup = 'Data Master';
 
     protected static ?string $recordTitleAttribute = 'Office';
     protected static bool $shouldRegisterNavigation = true;
 
-      public static function form(Schema $schema): Schema
+    public static function form(Schema $schema): Schema
     {
         return OfficeForm::configure($schema);
     }
@@ -33,9 +34,7 @@ class OfficeResource extends Resource
     public static function getPages(): array
     {
         return [
-            'index' => Pages\ListOffices::route('/'),
-             'create' => Pages\CreateOffice::route('/create'),
-            'edit'  => Pages\EditOffice::route('/edit'),
+            'index' => Pages\OfficeSetting::route('/'),
         ];
     }
 

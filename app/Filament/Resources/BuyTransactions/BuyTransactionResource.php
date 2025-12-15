@@ -16,15 +16,25 @@ use Filament\Schemas\Schema;
 use Filament\Support\Icons\Heroicon;
 use Filament\Tables\Table;
 use App\Filament\Resources\BuyTransactions\Schemas\BuyTransactionInfolist;
+use Illuminate\Database\Eloquent\Builder;
 
 class BuyTransactionResource extends Resource
 {
     protected static ?string $model = BuyTransaction::class;
 
     protected static string|BackedEnum|null $navigationIcon = Heroicon::ShoppingBag;
+    protected static string|\UnitEnum|null $navigationGroup = 'Transaksi';
 
-    protected static ?string $recordTitleAttribute = 'Buy Transaction';
+    protected static ?string $recordTitleAttribute = 'Transaksi Tukar Uang';
+    public static function getPluralLabel(): string
+    {
+        return 'Beli Mata Uang';
+    }
 
+    public static function getEmptyStateHeading(): ?string
+    {
+        return 'Data transaksi masih kosong';
+    }
     public static function form(Schema $schema): Schema
     {
         return BuyTransactionForm::configure($schema);
@@ -39,7 +49,15 @@ class BuyTransactionResource extends Resource
     {
         return BuyTransactionsTable::configure($table);
     }
-
+    public static function getRelations(): array
+    {
+        return [];
+    }
+    public static function getEloquentQuery(): Builder
+    {
+        return parent::getEloquentQuery()
+            ->with('items'); // ⬅️ WAJIB
+    }
     public static function getPages(): array
     {
         return [

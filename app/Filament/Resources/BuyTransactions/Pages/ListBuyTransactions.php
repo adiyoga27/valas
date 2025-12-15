@@ -10,10 +10,20 @@ class ListBuyTransactions extends ListRecords
 {
     protected static string $resource = BuyTransactionResource::class;
 
+    protected function getEmptyStateHeading(): ?string
+    {
+        return 'Belum ada transaksi pembelian';
+    }
+
+    protected function getEmptyStateDescription(): ?string
+    {
+        return 'Silakan tambahkan transaksi pembelian pertama.';
+    }
+
     protected function getHeaderActions(): array
     {
         return [
-            CreateAction::make(),
+            CreateAction::make()->label('Tambah Transaksi'),
         ];
     }
 }

@@ -18,7 +18,8 @@ class BuyTransactionInfolist
     {
         return $schema
             ->components([
-              Section::make('Invoice Pembelian (Buy Transaction)')
+                Section::make('Invoice Pembelian (Buy Transaction)')
+                 ->columnSpanFull()
                     ->schema([
                         // Header Transaksi: Code, Customer, Tanggal
                         Grid::make(2)
@@ -29,8 +30,7 @@ class BuyTransactionInfolist
                                     ->weight(FontWeight::Bold),
                                 TextEntry::make('created_at')
                                     ->label('Tanggal Transaksi')
-                                    ->dateTime('d M Y H:i:s')
-                                    ->alignment(Alignment::End),
+                                    ->dateTime('d M Y H:i')->timezone('Asia/Makassar'),
                             ]),
 
                         Fieldset::make('Informasi Pelanggan')
@@ -82,7 +82,7 @@ class BuyTransactionInfolist
                                     ->label('Catatan')
                                     ->default('-')
                                     ->columnSpan(2),
-                                    
+
                                 // Total Amount
                                 TextEntry::make('total_amount')
                                     ->label('TOTAL PEMBAYARAN')

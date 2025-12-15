@@ -17,6 +17,7 @@ return new class extends Migration
             $table->foreignId('user_id')->constrained('users');
             $table->string('customer_name')->nullable();
             $table->decimal('total_amount', 18, 2); // Total dalam IDR
+            $table->text('notes')->nullable();
             $table->timestamps();
         });
     }

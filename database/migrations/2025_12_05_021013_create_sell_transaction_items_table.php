@@ -27,6 +27,7 @@ return new class extends Migration
             $table->decimal('nominal_foreign', 18, 2);
             $table->decimal('currency_rate', 18, 2);
             $table->decimal('subtotal_idr', 18, 2);
+            $table->text('notes')->nullable();
 
             $table->timestamps();
         });
