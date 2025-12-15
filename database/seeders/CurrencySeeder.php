@@ -2,152 +2,123 @@
 
 namespace Database\Seeders;
 
-use Illuminate\Database\Console\Seeds\WithoutModelEvents;
+use App\Models\Currency;
 use Illuminate\Database\Seeder;
-use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Storage;
 
 class CurrencySeeder extends Seeder
 {
-    /**
-     * Run the database seeds.
-     */
     public function run(): void
     {
-       $countries = [
-            ["AD","Andorra"], ["AE","United Arab Emirates"], ["AF","Afghanistan"],
-            ["AG","Antigua and Barbuda"], ["AI","Anguilla"], ["AL","Albania"],
-            ["AM","Armenia"], ["AO","Angola"], ["AQ","Antarctica"], ["AR","Argentina"],
-            ["AS","American Samoa"], ["AT","Austria"], ["AU","Australia"],
-            ["AW","Aruba"], ["AX","Åland Islands"], ["AZ","Azerbaijan"],
+        $currencies = [
+            // === Americas ===
+            ['USD','United States Dollar','US', true],
+            ['CAD','Canadian Dollar','CA', true],
+            ['MXN','Mexican Peso','MX'],
+            ['BRL','Brazilian Real','BR'],
+            ['ARS','Argentine Peso','AR'],
+            ['CLP','Chilean Peso','CL'],
+            ['COP','Colombian Peso','CO'],
+            ['PEN','Peruvian Sol','PE'],
+            ['UYU','Uruguayan Peso','UY'],
+            ['BOB','Bolivian Boliviano','BO'],
+            ['VES','Venezuelan Bolívar','VE'],
 
-            ["BA","Bosnia and Herzegovina"], ["BB","Barbados"], ["BD","Bangladesh"],
-            ["BE","Belgium"], ["BF","Burkina Faso"], ["BG","Bulgaria"],
-            ["BH","Bahrain"], ["BI","Burundi"], ["BJ","Benin"], ["BL","Saint Barthélemy"],
-            ["BM","Bermuda"], ["BN","Brunei Darussalam"], ["BO","Bolivia"],
-            ["BQ","Caribbean Netherlands"], ["BR","Brazil"], ["BS","Bahamas"],
-            ["BT","Bhutan"], ["BV","Bouvet Island"], ["BW","Botswana"],
-            ["BY","Belarus"], ["BZ","Belize"],
+            // === Europe ===
+            ['EUR','Euro','EU', true],
+            ['GBP','British Pound Sterling','GB', true],
+            ['CHF','Swiss Franc','CH'],
+            ['SEK','Swedish Krona','SE'],
+            ['NOK','Norwegian Krone','NO'],
+            ['DKK','Danish Krone','DK'],
+            ['PLN','Polish Zloty','PL'],
+            ['CZK','Czech Koruna','CZ'],
+            ['HUF','Hungarian Forint','HU'],
+            ['RON','Romanian Leu','RO'],
+            ['BGN','Bulgarian Lev','BG'],
+            ['HRK','Croatian Kuna','HR'],
+            ['RSD','Serbian Dinar','RS'],
+            ['UAH','Ukrainian Hryvnia','UA'],
+            ['RUB','Russian Ruble','RU'],
 
-            ["CA","Canada"], ["CC","Cocos Islands"], ["CD","Congo (DRC)"],
-            ["CF","Central African Republic"], ["CG","Congo"], ["CH","Switzerland"],
-            ["CI","Ivory Coast"], ["CK","Cook Islands"], ["CL","Chile"],
-            ["CM","Cameroon"], ["CN","China"], ["CO","Colombia"], ["CR","Costa Rica"],
-            ["CU","Cuba"], ["CV","Cabo Verde"], ["CW","Curaçao"], ["CX","Christmas Island"],
-            ["CY","Cyprus"], ["CZ","Czechia"],
+            // === Asia ===
+            ['IDR','Indonesian Rupiah','ID', true],
+            ['JPY','Japanese Yen','JP', true],
+            ['CNY','Chinese Yuan','CN', true],
+            ['KRW','South Korean Won','KR'],
+            ['SGD','Singapore Dollar','SG', true],
+            ['MYR','Malaysian Ringgit','MY'],
+            ['THB','Thai Baht','TH'],
+            ['PHP','Philippine Peso','PH'],
+            ['VND','Vietnamese Dong','VN'],
+            ['INR','Indian Rupee','IN'],
+            ['PKR','Pakistani Rupee','PK'],
+            ['BDT','Bangladeshi Taka','BD'],
+            ['LKR','Sri Lankan Rupee','LK'],
+            ['NPR','Nepalese Rupee','NP'],
+            ['KHR','Cambodian Riel','KH'],
+            ['LAK','Lao Kip','LA'],
+            ['MMK','Myanmar Kyat','MM'],
 
-            ["DE","Germany"], ["DJ","Djibouti"], ["DK","Denmark"], ["DM","Dominica"],
-            ["DO","Dominican Republic"], ["DZ","Algeria"],
+            // === Middle East ===
+            ['AED','UAE Dirham','AE'],
+            ['SAR','Saudi Riyal','SA'],
+            ['QAR','Qatari Riyal','QA'],
+            ['KWD','Kuwaiti Dinar','KW'],
+            ['BHD','Bahraini Dinar','BH'],
+            ['OMR','Omani Rial','OM'],
+            ['ILS','Israeli New Shekel','IL'],
+            ['IRR','Iranian Rial','IR'],
+            ['IQD','Iraqi Dinar','IQ'],
 
-            ["EC","Ecuador"], ["EE","Estonia"], ["EG","Egypt"], ["EH","Western Sahara"],
-            ["ER","Eritrea"], ["ES","Spain"], ["ET","Ethiopia"],
+            // === Africa ===
+            ['ZAR','South African Rand','ZA'],
+            ['NGN','Nigerian Naira','NG'],
+            ['EGP','Egyptian Pound','EG'],
+            ['KES','Kenyan Shilling','KE'],
+            ['TZS','Tanzanian Shilling','TZ'],
+            ['UGX','Ugandan Shilling','UG'],
+            ['GHS','Ghanaian Cedi','GH'],
+            ['MAD','Moroccan Dirham','MA'],
+            ['XOF','West African CFA Franc','SN'],
+            ['XAF','Central African CFA Franc','CM'],
 
-            ["FI","Finland"], ["FJ","Fiji"], ["FK","Falkland Islands"],
-            ["FM","Micronesia"], ["FO","Faroe Islands"], ["FR","France"],
-
-            ["GA","Gabon"], ["GB","United Kingdom"], ["GD","Grenada"],
-            ["GE","Georgia"], ["GF","French Guiana"], ["GG","Guernsey"],
-            ["GH","Ghana"], ["GI","Gibraltar"], ["GL","Greenland"],
-            ["GM","Gambia"], ["GN","Guinea"], ["GP","Guadeloupe"],
-            ["GQ","Equatorial Guinea"], ["GR","Greece"], ["GS","South Georgia"],
-            ["GT","Guatemala"], ["GU","Guam"], ["GW","Guinea-Bissau"],
-            ["GY","Guyana"],
-
-            ["HK","Hong Kong"], ["HM","Heard Island"], ["HN","Honduras"],
-            ["HR","Croatia"], ["HT","Haiti"], ["HU","Hungary"],
-
-            ["ID","Indonesia"], ["IE","Ireland"], ["IL","Israel"],
-            ["IM","Isle of Man"], ["IN","India"], ["IO","British Indian Ocean Territory"],
-            ["IQ","Iraq"], ["IR","Iran"], ["IS","Iceland"], ["IT","Italy"],
-
-            ["JE","Jersey"], ["JM","Jamaica"], ["JO","Jordan"], ["JP","Japan"],
-
-            ["KE","Kenya"], ["KG","Kyrgyzstan"], ["KH","Cambodia"], ["KI","Kiribati"],
-            ["KM","Comoros"], ["KN","Saint Kitts and Nevis"], ["KP","North Korea"],
-            ["KR","South Korea"], ["KW","Kuwait"], ["KY","Cayman Islands"],
-            ["KZ","Kazakhstan"],
-
-            ["LA","Laos"], ["LB","Lebanon"], ["LC","Saint Lucia"], ["LI","Liechtenstein"],
-            ["LK","Sri Lanka"], ["LR","Liberia"], ["LS","Lesotho"], ["LT","Lithuania"],
-            ["LU","Luxembourg"], ["LV","Latvia"], ["LY","Libya"],
-
-            ["MA","Morocco"], ["MC","Monaco"], ["MD","Moldova"], ["ME","Montenegro"],
-            ["MF","Saint Martin"], ["MG","Madagascar"], ["MH","Marshall Islands"],
-            ["MK","North Macedonia"], ["ML","Mali"], ["MM","Myanmar"],
-            ["MN","Mongolia"], ["MO","Macao"], ["MP","Northern Mariana Islands"],
-            ["MQ","Martinique"], ["MR","Mauritania"], ["MS","Montserrat"],
-            ["MT","Malta"], ["MU","Mauritius"], ["MV","Maldives"],
-            ["MW","Malawi"], ["MX","Mexico"], ["MY","Malaysia"], ["MZ","Mozambique"],
-
-            ["NA","Namibia"], ["NC","New Caledonia"], ["NE","Niger"], ["NF","Norfolk Island"],
-            ["NG","Nigeria"], ["NI","Nicaragua"], ["NL","Netherlands"],
-            ["NO","Norway"], ["NP","Nepal"], ["NR","Nauru"], ["NU","Niue"],
-            ["NZ","New Zealand"],
-
-            ["OM","Oman"],
-
-            ["PA","Panama"], ["PE","Peru"], ["PF","French Polynesia"],
-            ["PG","Papua New Guinea"], ["PH","Philippines"], ["PK","Pakistan"],
-            ["PL","Poland"], ["PM","Saint Pierre and Miquelon"],
-            ["PN","Pitcairn Islands"], ["PR","Puerto Rico"], ["PS","Palestine"],
-            ["PT","Portugal"], ["PW","Palau"], ["PY","Paraguay"],
-
-            ["QA","Qatar"],
-
-            ["RE","Réunion"], ["RO","Romania"], ["RS","Serbia"], ["RU","Russia"],
-            ["RW","Rwanda"],
-
-            ["SA","Saudi Arabia"], ["SB","Solomon Islands"], ["SC","Seychelles"],
-            ["SD","Sudan"], ["SE","Sweden"], ["SG","Singapore"], ["SH","Saint Helena"],
-            ["SI","Slovenia"], ["SJ","Svalbard and Jan Mayen"], ["SK","Slovakia"],
-            ["SL","Sierra Leone"], ["SM","San Marino"], ["SN","Senegal"], ["SO","Somalia"],
-            ["SR","Suriname"], ["SS","South Sudan"], ["ST","Sao Tome and Principe"],
-            ["SV","El Salvador"], ["SX","Sint Maarten"], ["SY","Syria"], ["SZ","Eswatini"],
-
-            ["TC","Turks and Caicos Islands"], ["TD","Chad"], ["TF","French Southern Territories"],
-            ["TG","Togo"], ["TH","Thailand"], ["TJ","Tajikistan"], ["TK","Tokelau"],
-            ["TL","Timor-Leste"], ["TM","Turkmenistan"], ["TN","Tunisia"],
-            ["TO","Tonga"], ["TR","Turkey"], ["TT","Trinidad and Tobago"],
-            ["TV","Tuvalu"], ["TW","Taiwan"], ["TZ","Tanzania"],
-
-            ["UA","Ukraine"], ["UG","Uganda"], ["UM","US Minor Islands"],
-            ["US","United States"], ["UY","Uruguay"], ["UZ","Uzbekistan"],
-
-            ["VA","Vatican"], ["VC","Saint Vincent and the Grenadines"],
-            ["VE","Venezuela"], ["VG","Virgin Islands (UK)"], ["VI","Virgin Islands (US)"],
-            ["VN","Vietnam"], ["VU","Vanuatu"],
-
-            ["WF","Wallis and Futuna"], ["WS","Samoa"],
-
-            ["YE","Yemen"], ["YT","Mayotte"],
-
-            ["ZA","South Africa"], ["ZM","Zambia"], ["ZW","Zimbabwe"]
+            // === Oceania ===
+            ['AUD','Australian Dollar','AU', true],
+            ['NZD','New Zealand Dollar','NZ'],
+            ['FJD','Fijian Dollar','FJ'],
+            ['PGK','Papua New Guinea Kina','PG'],
         ];
 
-        foreach ($countries as [$code, $name]) {
+        foreach ($currencies as $currency) {
+            [$code, $name, $countryCode, $active] = array_pad($currency, 4, false);
 
-            $url = "https://flagsapi.com/{$code}/flat/64.png";
-            $path = "flags/" . strtolower($code) . ".png";
+            $flagPath = "flags/" . strtolower($countryCode) . ".png";
+
             // Download flag
             try {
-                $file = Http::get($url);
-                if ($file->successful()) {
-                    Storage::disk('public')->put($path, $file->body());
+                if (!Storage::disk('public')->exists($flagPath)) {
+                    $response = Http::get("https://flagsapi.com/{$countryCode}/flat/64.png");
+                    if ($response->successful()) {
+                        Storage::disk('public')->put($flagPath, $response->body());
+                    }
                 }
-            } catch (\Exception $e) {
-                dd($e);
-                continue;
+            } catch (\Throwable $e) {
+                $flagPath = null;
             }
 
-            DB::table('currencies')->insert([
-                'code'       => $code,
-                'name'       => $name,
-                'flag'       => $path,
-                'is_active'  => false,
-                'created_at' => now(),
-                'updated_at' => now(),
-            ]);
+            Currency::updateOrCreate(
+                ['code' => $code],
+                [
+                    'name'         => $name,
+                    'country_code' => $countryCode,
+                    'flag'         => $flagPath,
+                    'buy_rate'     => 0,
+                    'sell_rate'    => 0,
+                    'is_active'    => $active,
+                ]
+            );
         }
     }
 }

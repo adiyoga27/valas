@@ -13,7 +13,8 @@ return new class extends Migration
     {
         Schema::create('currencies', function (Blueprint $table) {
             $table->id();
-            $table->string('code', 5); // USD, JPY
+            $table->string('code', 15); // USD, JPY
+            $table->string('country_code', 15);
             $table->string('name');
             $table->string('flag')->nullable(); // /flags/us.png
             $table->decimal('buy_rate', 18, 2)->default(0.0);   // Customer jual

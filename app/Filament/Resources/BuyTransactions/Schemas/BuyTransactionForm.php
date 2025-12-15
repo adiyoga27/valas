@@ -47,7 +47,7 @@ class BuyTransactionForm
                                 ->label('Currency')
                                 ->required()
                                 ->options(
-                                    Currency::all()->pluck('display_name', 'id')
+                                    Currency::all()->where('buy_rate', '>', 0)->where('is_active', true)->pluck('display_name', 'id')
                                 )
                                 ->searchable()
                                 ->reactive()
@@ -64,17 +64,36 @@ class BuyTransactionForm
                                 })->label("Mata Uang"),
 
 
-                            TextInput::make('currency_code')
-                                ->disabled()
-                                ->dehydrated()
-                                ->label('Code'),
-
-                            TextInput::make('buy_rate')
-                                ->disabled()
-                                ->numeric()
-                                ->dehydrated()
-                                ->columnSpan(2)
-                                ->label('Buy Rate')->label("Kurs Beli"),
+                            // TextInput::make('currency_code')
+                            //     ->disabled()
+                            //     ->dehydrated()
+                            //     ->label('Code'),
+ Placeholder::make('currency_code_view')
+                                ->label('Kode')
+                                ->content(
+                                    fn(callable $get) => $get('currency_code')
+                                )
+                                ->columnSpan(2),
+                            // TextInput::make('buy_rate')
+                            //     ->label('Kurs Beli')
+                            //     ->disabled()
+                            //     ->numeric()
+                            //     ->columnSpan(2)
+                            //     ->formatStateUsing(
+                            //         fn($state) =>
+                            //         $state ? number_format($state, 0, ',', '.') : null
+                            //     )
+                            //     ->dehydrateStateUsing(
+                            //         fn($state) =>
+                            //         (int) str_replace('.', '', $state)
+                            //     ),
+ Placeholder::make('buy_rate_view')
+                                ->label('Kurs Beli')
+                                ->content(
+                                    fn(callable $get) =>
+                                    number_format($get('buy_rate') ?? 0, 0, ',', '.')
+                                )
+                                ->columnSpan(2),
 
                             TextInput::make('qty')
                                 ->label('Jumlah')
@@ -87,12 +106,20 @@ class BuyTransactionForm
                                     BuyTransactionForm::updateParentTotal($get, $set);
                                 }),
 
-                            TextInput::make('total')
+                            // Hidden::make('total')
+                            //     ->label('Total')
+                            //     ->columnSpan(2)
+                            //     ->dehydrated()
+                            //     ->numeric()
+                            //     ->disabled(),
+
+                            Placeholder::make('total_view')
                                 ->label('Total')
-                                ->columnSpan(2)
-                                ->dehydrated()
-                                ->numeric()
-                                ->disabled(),
+                                ->content(
+                                    fn(callable $get) =>
+                                    number_format($get('total') ?? 0, 0, ',', '.')
+                                )
+                                ->columnSpan(2),
                         ])
                     ])
                     ->columns(1)

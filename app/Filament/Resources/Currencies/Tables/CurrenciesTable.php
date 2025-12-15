@@ -21,6 +21,8 @@ class CurrenciesTable
                     ->searchable(),
                 TextColumn::make('name')
                     ->searchable(),
+                             TextColumn::make('country_code')
+                    ->searchable(),
                 ImageColumn::make('flag')->label('Flag')
                 ->size(40)
                 ->disk('public'),

@@ -19,6 +19,8 @@ public static function configure(Schema $schema): Schema
         ->components([
             TextInput::make('code')
                 ->required(),
+                TextInput::make('country_code')
+                ->required(),
             TextInput::make('name')
                 ->required(),
             TextInput::make('buy_rate')
