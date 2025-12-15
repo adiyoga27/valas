@@ -2,6 +2,8 @@
 
 namespace App\Filament\Resources\Offices\Schemas;
 
+use Filament\Forms\Components\FileUpload;
+use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
 use Filament\Schemas\Schema;
 
@@ -12,10 +14,20 @@ class OfficeForm
         return $schema
             ->components([
                 TextInput::make('name')
+                    ->label('Office Name')
                     ->required(),
-                TextInput::make('address'),
+
+                Textarea::make('address')
+                    ->required(),
+
                 TextInput::make('phone')
-                    ->tel(),
+                    ->tel()
+                    ->required(),
+
+                FileUpload::make('logo')
+                    ->image()
+                    ->directory('office-logo')
+                    ->maxSize(2048),
             ]);
     }
 }

@@ -21,7 +21,7 @@ class BuyTransactionResource extends Resource
 {
     protected static ?string $model = BuyTransaction::class;
 
-    protected static string|BackedEnum|null $navigationIcon = Heroicon::OutlinedRectangleStack;
+    protected static string|BackedEnum|null $navigationIcon = Heroicon::ShoppingBag;
 
     protected static ?string $recordTitleAttribute = 'Buy Transaction';
 

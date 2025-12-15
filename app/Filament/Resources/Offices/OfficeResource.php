@@ -20,39 +20,32 @@ class OfficeResource extends Resource
 {
     protected static ?string $model = Office::class;
 
-    protected static string|BackedEnum|null $navigationIcon = Heroicon::OutlinedRectangleStack;
+    protected static string|BackedEnum|null $navigationIcon = Heroicon::BuildingOffice2;
 
     protected static ?string $recordTitleAttribute = 'Office';
+    protected static bool $shouldRegisterNavigation = true;
 
-    public static function form(Schema $schema): Schema
+      public static function form(Schema $schema): Schema
     {
         return OfficeForm::configure($schema);
-    }
-
-    public static function infolist(Schema $schema): Schema
-    {
-        return OfficeInfolist::configure($schema);
-    }
-
-    public static function table(Table $table): Table
-    {
-        return OfficesTable::configure($table);
-    }
-
-    public static function getRelations(): array
-    {
-        return [
-            //
-        ];
     }
 
     public static function getPages(): array
     {
         return [
-            'index' => ListOffices::route('/'),
-            'create' => CreateOffice::route('/create'),
-            'view' => ViewOffice::route('/{record}'),
-            'edit' => EditOffice::route('/{record}/edit'),
+            'index' => Pages\ListOffices::route('/'),
+             'create' => Pages\CreateOffice::route('/create'),
+            'edit'  => Pages\EditOffice::route('/edit'),
         ];
+    }
+
+    public static function canCreate(): bool
+    {
+        return false;
+    }
+
+    public static function canDeleteAny(): bool
+    {
+        return false;
     }
 }

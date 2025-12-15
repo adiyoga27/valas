@@ -10,5 +10,6 @@ class Office extends Model
         'name',
         'address',
         'phone',
+        'logo'
     ];
 }
