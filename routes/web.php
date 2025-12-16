@@ -5,7 +5,7 @@ use App\Http\Controllers\BuyTransactionPrintController;
 use App\Http\Controllers\SellTransactionPrintController;
 
 Route::get('/', function () {
-    return view('welcome');
+    return redirect('/admin');
 });
 
 
