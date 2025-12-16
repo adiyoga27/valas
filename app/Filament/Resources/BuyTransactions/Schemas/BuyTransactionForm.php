@@ -77,13 +77,7 @@ class BuyTransactionForm
                                 )
                                 ->columnSpan(2),
 
-                            Placeholder::make('buy_rate_view')
-                                ->label('Kurs Beli')
-                                ->content(
-                                    fn(callable $get) =>
-                                    number_format($get('buy_rate') ?? 0, 0, ',', '.')
-                                )
-                                ->columnSpan(2),
+                           
 
                             TextInput::make('qty')
                                 ->label('Jumlah')
@@ -95,7 +89,13 @@ class BuyTransactionForm
                                     $set('total', $get('buy_rate') * $state);
                                     BuyTransactionForm::updateParentTotal($get, $set);
                                 }),
-
+ Placeholder::make('buy_rate_view')
+                                ->label('Kurs Beli')
+                                ->content(
+                                    fn(callable $get) =>
+                                    number_format($get('buy_rate') ?? 0, 0, ',', '.')
+                                )
+                                ->columnSpan(2),
                             Placeholder::make('total_view')
                                 ->label('Total')
                                 ->content(

@@ -16,9 +16,9 @@ return new class extends Migration
             $table->string('transaction_code')->unique();
             $table->foreignId('user_id')->constrained('users');
             $table->string('customer_name')->nullable();
-            $table->decimal('grand_total', 18, 2)->default(0); // Grand total dalam
-            $table->json('additional_amounts')->nullable(); // Menyimpan detail item pembelian dalam format JSON
             $table->decimal('total_amount', 18, 2)->default(0); // Total dalam IDR
+            $table->json('additional_amounts')->nullable(); // Menyimpan detail item pembelian dalam format JSON
+            $table->decimal('grand_total', 18, 2)->default(0); // Grand total dalam
             $table->text('notes')->nullable();
             $table->timestamps();
             $table->softDeletes();

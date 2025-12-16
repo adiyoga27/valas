@@ -37,11 +37,15 @@ class EditBuyTransaction extends EditRecord
     {
           return DB::transaction(function () use ($record, $data) {
         $items = $data['items'] ?? [];
-        unset($data['items']);
+     $additionalAmounts = $data['additional_amounts'] ?? [];
+
+            unset($data['items'], $data['additional_amounts']);
 
         // Update header
         $record->update([
             'customer_name' => $data['customer_name'],
+            'notes' => $data['notes'] ?? null,
+            'additional_amounts' => $additionalAmounts,
         ]);
 
         // Reset items lama
@@ -67,6 +71,7 @@ class EditBuyTransaction extends EditRecord
 
         $record->update([
             'total_amount' => $total,
+            'grand_total' => $total + collect($additionalAmounts)->sum('amount'),
         ]);
 
         return $record;

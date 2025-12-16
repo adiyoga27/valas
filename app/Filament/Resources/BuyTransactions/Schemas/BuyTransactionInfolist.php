@@ -98,37 +98,38 @@ class BuyTransactionInfolist
                             ]),
 
                         Section::make('Ringkasan Transaksi')
-    ->schema([
-        // TOTAL ITEM, BIAYA TAMBAHAN, GRAND TOTAL
-        TextEntry::make('total_amount')
-            ->label('Total Item')
-            ->money('IDR')
-            ->weight(FontWeight::Bold),
+                            ->schema([
+                                // TOTAL ITEM, BIAYA TAMBAHAN, GRAND TOTAL
+                                TextEntry::make('total_amount')
+                                    ->label('Total Item')
+                                    ->money('IDR')
+                                    ->weight(FontWeight::Bold),
 
-        TextEntry::make('additional_total')
-            ->label('Total Biaya Tambahan')
-            ->state(fn($record) =>
-                collect($record->additional_amounts)->sum('amount')
-            )
-            ->money('IDR'),
+                                TextEntry::make('additional_total')
+                                    ->label('Total Biaya Tambahan')
+                                    ->state(
+                                        fn($record) =>
+                                        collect($record->additional_amounts)->sum('amount')
+                                    )
+                                    ->money('IDR'),
 
-        TextEntry::make('grand_total')
-            ->label('GRAND TOTAL')
-            ->money('IDR')
-            ->size(TextSize::Large)
-            ->weight(FontWeight::ExtraBold)
-            ->color('success'),
+                                TextEntry::make('grand_total')
+                                    ->label('GRAND TOTAL')
+                                    ->money('IDR')
+                                    ->size(TextSize::Large)
+                                    ->weight(FontWeight::ExtraBold)
+                                    ->color('success'),
 
-        // CATATAN
-        \Filament\Forms\Components\Placeholder::make('notes_view')
-            ->label('Catatan')
-            ->content(fn($record) => $record->notes ?: '-')
-            ->columnSpanFull(),
-    ])
-    ->columnSpanFull()
-    ->extraAttributes([
-        'class' => 'text-right',
-    ]),
+                                // CATATAN
+                                \Filament\Forms\Components\Placeholder::make('notes_view')
+                                    ->label('Catatan')
+                                    ->content(fn($record) => $record->notes ?: '-')
+                                    ->columnSpanFull(),
+                            ])
+                            ->columnSpanFull()
+                            ->extraAttributes([
+                                'class' => 'text-right',
+                            ]),
 
                     ])->columns(1),
             ]);

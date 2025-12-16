@@ -14,7 +14,7 @@ use Filament\Schemas\Schema;
 
 class SellTransactionsForm
 {
-     public static function configure(Schema $schema): Schema
+    public static function configure(Schema $schema): Schema
     {
         return $schema
             ->columns(2)
@@ -72,10 +72,7 @@ class SellTransactionsForm
                                 ->content(fn($get) => $get('currency_code'))
                                 ->columnSpan(2),
 
-                            Placeholder::make('sell_rate_view')
-                                ->label('Kurs Jual')
-                                ->content(fn($get) => number_format($get('sell_rate') ?? 0, 0, ',', '.'))
-                                ->columnSpan(2),
+
 
                             TextInput::make('qty')
                                 ->label('Jumlah')
@@ -83,11 +80,15 @@ class SellTransactionsForm
                                 ->numeric()
                                 ->columnSpan(2)
                                 ->reactive()
+                                ->debounce(800)
                                 ->afterStateUpdated(function ($state, $set, $get) {
                                     $set('total', $get('sell_rate') * $state);
                                     SellTransactionsForm::updateParentTotal($get, $set);
                                 }),
-
+                            Placeholder::make('sell_rate_view')
+                                ->label('Kurs Jual')
+                                ->content(fn($get) => number_format($get('sell_rate') ?? 0, 0, ',', '.'))
+                                ->columnSpan(2),
                             Placeholder::make('total_view')
                                 ->label('Total')
                                 ->content(fn($get) => number_format($get('total') ?? 0, 0, ',', '.'))
@@ -106,7 +107,7 @@ class SellTransactionsForm
                     ->schema([
                         Grid::make(12)->schema([
                             TextInput::make('name')->label('Nama Biaya')->required()->columnSpan(7),
-                            TextInput::make('amount')->label('Jumlah')->numeric()->required()->reactive()->columnSpan(5)
+                            TextInput::make('amount')->label('Jumlah')->numeric()->required()->reactive()->columnSpan(5)->debounce(800)
                                 ->afterStateUpdated(function ($state, $set, $get) {
                                     SellTransactionsForm::updateGrandTotal($get, $set);
                                 }),
@@ -114,23 +115,23 @@ class SellTransactionsForm
                     ])
                     ->columns(1)
                     ->columnSpanFull()
-                    ->afterStateUpdated(fn($get,$set)=>SellTransactionsForm::updateGrandTotal($get,$set))
+                    ->afterStateUpdated(fn($get, $set) => SellTransactionsForm::updateGrandTotal($get, $set))
                     ->addActionLabel('+ Tambah Biaya Tambahan'),
 
                 Placeholder::make('total_display')
                     ->label('Total Transaksi')
-                    ->content(fn($get) => 'Rp '.number_format(collect($get('items'))->sum('total') ?? 0,0,',','.'))
+                    ->content(fn($get) => 'Rp ' . number_format(collect($get('items'))->sum('total') ?? 0, 0, ',', '.'))
                     ->columnSpan(2),
 
                 Placeholder::make('additional_display')
                     ->label('Total Biaya Tambahan')
-                    ->content(fn($get) => 'Rp '.number_format(collect($get('additional_amounts'))->sum('amount') ?? 0,0,',','.'))
+                    ->content(fn($get) => 'Rp ' . number_format(collect($get('additional_amounts'))->sum('amount') ?? 0, 0, ',', '.'))
                     ->columnSpan(2),
 
                 Placeholder::make('grand_total_display')
                     ->label('Grand Total')
-                    ->content(fn($get) => 'Rp '.number_format(collect($get('items'))->sum('total') + collect($get('additional_amounts'))->sum('amount') ?? 0,0,',','.'))
-                    ->extraAttributes(['class'=>'text-right text-3xl font-bold text-success'])
+                    ->content(fn($get) => 'Rp ' . number_format(collect($get('items'))->sum('total') + collect($get('additional_amounts'))->sum('amount') ?? 0, 0, ',', '.'))
+                    ->extraAttributes(['class' => 'text-right text-3xl font-bold text-success'])
                     ->columnSpan(2),
             ]);
     }
