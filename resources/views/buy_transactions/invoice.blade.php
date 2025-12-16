@@ -183,7 +183,7 @@
 
     <!-- TOTAL -->
     <table class="totals-table">
-        <tr>
+        {{-- <tr>
             <td class="label">SUBTOTAL</td>
             <td class="value">{{ number_format($transaction->total_amount, 0, ',', '.') }}</td>
         </tr>
@@ -195,7 +195,7 @@
                     <td class="value">{{ number_format($add['amount'], 0, ',', '.') }}</td>
                 </tr>
             @endforeach
-        @endif
+        @endif --}}
 
         <tr class="grand">
             <td class="label">GRAND TOTAL</td>
