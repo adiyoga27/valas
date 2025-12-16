@@ -3,6 +3,7 @@
 namespace App\Providers\Filament;
 
 use App\Models\BuyTransaction;
+use App\Models\Office;
 use Filament\Http\Middleware\Authenticate;
 use Filament\Http\Middleware\AuthenticateSession;
 use Filament\Http\Middleware\DisableBladeIconComponents;
@@ -25,10 +26,12 @@ class AdminPanelProvider extends PanelProvider
 {
     public function panel(Panel $panel): Panel
     {
+         $office = Office::query()->first();
         return $panel
             ->default()
             ->id('admin')
             ->path('admin')
+            ->brandName($office?->name ?? 'Admin Panel')
             ->login()
             ->colors([
                 'primary' => Color::Amber,
