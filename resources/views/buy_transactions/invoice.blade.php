@@ -117,11 +117,12 @@
     font-size:9px;
     border-collapse:collapse;
     font-family: Arial, sans-serif;
+    font-weight: normal;
 ">
     <tr>
-        <td style="width:80px;">CODE</td>
-        <td style="width:10px;">:</td>
-        <td>{{ $transaction->transaction_code }}</td>
+        <td style="width:70px; font-weight:normal;">CODE</td>
+        <td style="width:5px;">:</td>
+        <td style="font-weight:normal;">{{ $transaction->transaction_code }}</td>
     </tr>
     <tr>
         <td>DATE</td>
