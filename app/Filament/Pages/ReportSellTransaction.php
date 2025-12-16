@@ -2,6 +2,10 @@
 
 namespace App\Filament\Pages;
 
+use App\Exports\ReportSellTransactionExport;
+use Maatwebsite\Excel\Facades\Excel;
+use Filament\Actions\Action;
+
 use App\Models\SellTransaction;
 use Carbon\Carbon;
 use Filament\Forms;
@@ -32,6 +36,26 @@ class ReportSellTransaction extends Page implements Tables\Contracts\HasTable, F
         $this->startDate = now()->startOfMonth()->toDateString();
         $this->endDate   = now()->toDateString();
     }
+
+    protected function getHeaderActions(): array
+{
+    return [
+        Action::make('export')
+            ->label('Export Excel')
+            ->icon('heroicon-o-arrow-down-tray')
+            ->color('success')
+            ->action(fn () =>
+                Excel::download(
+                    new ReportSellTransactionExport(
+                        $this->startDate,
+                        $this->endDate
+                    ),
+                    'report-penjualan-valas.xlsx'
+                )
+            ),
+    ];
+}
+
 
     public function form(Schema $form): Schema
     {

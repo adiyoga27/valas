@@ -11,6 +11,10 @@ use Filament\Schemas\Schema;
 use Filament\Tables;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
+use App\Exports\ReportBuyTransactionExport;
+use Maatwebsite\Excel\Facades\Excel;
+use Filament\Actions\Action;
+
 
 class ReportBuyTransaction extends Page implements Tables\Contracts\HasTable, Forms\Contracts\HasForms
 {
@@ -32,6 +36,24 @@ class ReportBuyTransaction extends Page implements Tables\Contracts\HasTable, Fo
         $this->startDate = now()->startOfMonth()->toDateString();
         $this->endDate   = now()->toDateString();
     }
+protected function getHeaderActions(): array
+{
+    return [
+        Action::make('export')
+            ->label('Export Excel')
+            ->icon('heroicon-o-arrow-down-tray')
+            ->color('success')
+            ->action(fn () =>
+                Excel::download(
+                    new ReportBuyTransactionExport(
+                        $this->startDate,
+                        $this->endDate
+                    ),
+                    'report-pembelian-valas.xlsx'
+                )
+            ),
+    ];
+}
 
     public function form(Schema $form): Schema
     {
