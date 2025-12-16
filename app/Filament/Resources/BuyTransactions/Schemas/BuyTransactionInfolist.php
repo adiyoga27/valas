@@ -2,6 +2,7 @@
 
 namespace App\Filament\Resources\BuyTransactions\Schemas;
 
+use Filament\Infolists\Components\RepeatableEntry;
 use Filament\Infolists\Components\TextEntry;
 use Filament\Schemas\Components\Fieldset;
 use Filament\Schemas\Components\Grid;
@@ -19,7 +20,7 @@ class BuyTransactionInfolist
         return $schema
             ->components([
                 Section::make('Invoice Pembelian (Buy Transaction)')
-                 ->columnSpanFull()
+                    ->columnSpanFull()
                     ->schema([
                         // Header Transaksi: Code, Customer, Tanggal
                         Grid::make(2)
@@ -73,25 +74,62 @@ class BuyTransactionInfolist
                                     ->contained(false) // Membuat repeater tanpa border luar
                                     ->columns(1)
                             ]),
-
-                        // Footer Transaksi: Total Amount
-                        Grid::make(3)
+                        Section::make('Biaya Tambahan')
                             ->schema([
-                                // Placeholder untuk Balance/Keterangan
-                                TextEntry::make('note')
-                                    ->label('Catatan')
-                                    ->default('-')
-                                    ->columnSpan(2),
+                                RepeatableEntry::make('additional_amounts')
+                                    ->schema([
+                                        Grid::make(6)->schema([
+                                            TextEntry::make('name')
+                                                ->label('Nama Biaya')
+                                                ->columnSpan(4),
 
-                                // Total Amount
-                                TextEntry::make('total_amount')
-                                    ->label('TOTAL PEMBAYARAN')
-                                    ->money('IDR')
-                                    ->size(TextSize::Large)
-                                    ->weight(FontWeight::ExtraBold)
-                                    ->color('primary')
-                                    ->columnSpan(1),
+                                            TextEntry::make('amount')
+                                                ->label('Jumlah')
+                                                ->money('IDR')
+                                                ->weight(FontWeight::Bold)
+                                                ->columnSpan(2),
+                                        ]),
+                                    ])
+                                    ->contained(false)
+                                    ->visible(
+                                        fn($record) =>
+                                        ! empty($record->additional_amounts)
+                                    ),
                             ]),
+
+                        Section::make('Ringkasan Transaksi')
+    ->schema([
+        // TOTAL ITEM, BIAYA TAMBAHAN, GRAND TOTAL
+        TextEntry::make('total_amount')
+            ->label('Total Item')
+            ->money('IDR')
+            ->weight(FontWeight::Bold),
+
+        TextEntry::make('additional_total')
+            ->label('Total Biaya Tambahan')
+            ->state(fn($record) =>
+                collect($record->additional_amounts)->sum('amount')
+            )
+            ->money('IDR'),
+
+        TextEntry::make('grand_total')
+            ->label('GRAND TOTAL')
+            ->money('IDR')
+            ->size(TextSize::Large)
+            ->weight(FontWeight::ExtraBold)
+            ->color('success'),
+
+        // CATATAN
+        \Filament\Forms\Components\Placeholder::make('notes_view')
+            ->label('Catatan')
+            ->content(fn($record) => $record->notes ?: '-')
+            ->columnSpanFull(),
+    ])
+    ->columnSpanFull()
+    ->extraAttributes([
+        'class' => 'text-right',
+    ]),
+
                     ])->columns(1),
             ]);
     }

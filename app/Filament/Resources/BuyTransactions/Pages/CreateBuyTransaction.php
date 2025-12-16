@@ -11,14 +11,10 @@ use Illuminate\Support\Facades\DB;
 class CreateBuyTransaction extends CreateRecord
 {
     protected static string $resource = BuyTransactionResource::class;
+   // Properti ini mengatur judul/heading halaman Create
+    protected  ?string $heading = 'Buat Transaksi Pembelian Mata Uang Asing'; // Gunakan $heading untuk Filament v3/v4
 
-
-
-    public static function getPluralLabel(): string
-    {
-        return 'Transaksi Pembelian';
-    }
-
+    
     public static function getEmptyStateHeading(): ?string
     {
         return 'Data transaksi masih kosong';
@@ -31,16 +27,19 @@ class CreateBuyTransaction extends CreateRecord
     {
         return DB::transaction(function () use ($data) {
             $items = $data['items'] ?? [];
-            $totalAmount = 0;
-            unset($data['items']);
+            $itemsTotal = 0;
+            $additionalAmounts = $data['additional_amounts'] ?? [];
+
+            unset($data['items'], $data['additional_amounts']);
             $transaction = BuyTransaction::create([
                 'transaction_code' => $data['transaction_code'] ?? 'BUY-' . time(),
                 'user_id' => $data['user_id'] ?? auth()->id(),
                 'customer_name' => $data['customer_name'] ?? null,
+                'notes' => $data['notes'] ?? null,
                 'total_amount' => 0,
             ]);
             foreach ($items as $item) {
-                $totalAmount += ($item['qty'] * $item['buy_rate']);
+                $itemsTotal += ($item['qty'] * $item['buy_rate']);
                 BuyTransactionItem::create([
                     'buy_transaction_id' => $transaction->id,
                     'currency_id' => $item['currency_id'],
@@ -52,7 +51,16 @@ class CreateBuyTransaction extends CreateRecord
                     'total' => $item['qty'] * $item['buy_rate'] ,
                 ]);
             }
-            $transaction->total_amount = $totalAmount;
+
+             // Hitung total biaya tambahan
+        $additionalTotal = collect($additionalAmounts)->sum('amount');
+
+        // Grand Total
+        $grandTotal = $itemsTotal + $additionalTotal;
+
+            $transaction->total_amount = $itemsTotal;
+            $transaction->additional_amounts = $additionalAmounts;
+            $transaction->grand_total = $grandTotal;
             $transaction->save();
             return $transaction;
         });

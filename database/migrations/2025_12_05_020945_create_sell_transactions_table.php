@@ -12,12 +12,17 @@ return new class extends Migration
     public function up(): void
     {
         Schema::create('sell_transactions', function (Blueprint $table) {
-            $table->id();
+              $table->id();
             $table->string('transaction_code')->unique();
             $table->foreignId('user_id')->constrained('users');
             $table->string('customer_name')->nullable();
-            $table->decimal('total_amount', 18, 2);
+            $table->decimal('grand_total', 18, 2)->default(0); // Grand total dalam
+            $table->json('additional_amounts')->nullable(); // Menyimpan detail item pembelian dalam format JSON
+            $table->decimal('total_amount', 18, 2)->default(0); // Total dalam IDR
+            $table->text('notes')->nullable();
             $table->timestamps();
+            $table->softDeletes();
+
         });
     }
 

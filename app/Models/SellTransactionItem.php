@@ -7,9 +7,15 @@ use Illuminate\Database\Eloquent\Model;
 class SellTransactionItem extends Model
 {
     protected $fillable = [
-        'sell_transaction_id','currency_id','currency_code',
-        'currency_name','currency_flag','nominal_foreign',
-        'currency_rate','subtotal_idr'
+        'sell_transaction_id',
+        'currency_id',
+        'currency_code',
+        'currency_name',
+        'currency_flag',
+        'nominal_foreign',
+        'sell_rate',
+        'qty',
+        'total',
     ];
 
     public function transaction()

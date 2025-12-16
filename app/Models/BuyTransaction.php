@@ -7,13 +7,22 @@ use Illuminate\Database\Eloquent\Model;
 class BuyTransaction extends Model
 {
     protected $fillable = [
-        'transaction_code','user_id','customer_name','total_amount', 'notes'
+        'transaction_code',
+        'user_id',
+        'customer_name',
+        'total_amount',
+        'notes',
+        'grand_total',
+        'additional_amounts'
     ];
 
-   public function items()
-{
-    return $this->hasMany(BuyTransactionItem::class);
-}
+    public $casts = [
+        'additional_amounts' => 'array',
+    ];
+    public function items()
+    {
+        return $this->hasMany(BuyTransactionItem::class);
+    }
 
     public function user()
     {

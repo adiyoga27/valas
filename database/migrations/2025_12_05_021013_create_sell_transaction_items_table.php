@@ -12,22 +12,19 @@ return new class extends Migration
     public function up(): void
     {
         Schema::create('sell_transaction_items', function (Blueprint $table) {
-            $table->id();
+           $table->id();
             $table->foreignId('sell_transaction_id')
                 ->constrained('sell_transactions')
                 ->cascadeOnDelete();
-
             $table->foreignId('currency_id')->constrained('currencies');
-
-            // Flatten info
+            // Flatten data mata uang saat transaksi
             $table->string('currency_code', 5);
             $table->string('currency_name');
             $table->string('currency_flag')->nullable();
 
-            $table->decimal('nominal_foreign', 18, 2);
-            $table->decimal('currency_rate', 18, 2);
-            $table->decimal('subtotal_idr', 18, 2);
-            $table->text('notes')->nullable();
+            $table->decimal('sell_rate', 18, 2);
+            $table->decimal('qty', 18, 2);
+            $table->decimal('total', 18, 2);
 
             $table->timestamps();
         });

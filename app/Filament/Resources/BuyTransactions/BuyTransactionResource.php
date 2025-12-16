@@ -28,7 +28,7 @@ class BuyTransactionResource extends Resource
     protected static ?string $recordTitleAttribute = 'Transaksi Tukar Uang';
     public static function getPluralLabel(): string
     {
-        return 'Beli Mata Uang';
+        return 'Beli Mata Uang Asing';
     }
 
     public static function getEmptyStateHeading(): ?string
