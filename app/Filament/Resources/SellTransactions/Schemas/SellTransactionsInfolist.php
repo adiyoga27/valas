@@ -35,21 +35,13 @@ class SellTransactionsInfolist
                         Fieldset::make('Informasi Pelanggan')
                             ->schema([
                                 TextEntry::make('customer_name')
-                                    ->label('Nama Pelanggan')
-                                    ->default('N/A'),
+                                    ->label('Nama Pelanggan'),
                                 TextEntry::make('passport_number')
-                                    ->label('Nomor Paspor')
-                                    ->default('N/A'),
+                                    ->label('Nomor Paspor'),
                                 TextEntry::make('customer_address')
-                                    ->label('Alamat Pelanggan')
-                                    ->default('N/A'),
+                                    ->label('Alamat Pelanggan'),
                                 TextEntry::make('customer_country')
-                                    ->label('Negara Pelanggan')
-                                    ->default('N/A'),
-                                TextEntry::make('customer_birthdate')
-                                    ->label('Tanggal Lahir Pelanggan')
-                                    ->date('d M Y')
-                                    ->default('N/A'),
+                                    ->label('Negara Pelanggan'),
                                 TextEntry::make('user.name')
                                     ->label('Dibuat Oleh')
                                     ->default('Sistem'),
