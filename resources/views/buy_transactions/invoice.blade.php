@@ -112,17 +112,44 @@
     </div>
 
     <!-- INFO -->
-    <p style="margin:4px 0;">
-        CODE : {{ $transaction->transaction_code }}<br>
-        DATE  : {{ $transaction->created_at->format('d M Y H:i') }}<br>
-        NAME : {{ $transaction->customer_name ?? 'N/A' }}<br>
-        PASSPORT : {{ $transaction->passport_number ?? 'N/A' }}<br>
-        ADDRESS : {{ $transaction->customer_address ?? 'N/A' }}<br>
-        COUNTRY : {{ $transaction->customer_country ?? 'N/A' }}<br>
-        {{-- DATE  : {{ $transaction->customer_birthdate ? \Carbon\Carbon::parse($transaction->customer_birthdate)->format('d M Y') : 'N/A' }}< --}}
-        ADMIN : {{ $transaction->user->name ?? 'Sistem' }}
+<table style="width:100%; font-size:12px; border-collapse:collapse;">
+    <tr>
+        <td style="width:80px;">CODE</td>
+        <td style="width:10px;">:</td>
+        <td>{{ $transaction->transaction_code }}</td>
+    </tr>
+    <tr>
+        <td>DATE</td>
+        <td>:</td>
+        <td>{{ $transaction->created_at->format('d M Y H:i') }}</td>
+    </tr>
+    <tr>
+        <td>NAME</td>
+        <td>:</td>
+        <td>{{ $transaction->customer_name ?? 'N/A' }}</td>
+    </tr>
+    <tr>
+        <td>PASSPORT</td>
+        <td>:</td>
+        <td>{{ $transaction->passport_number ?? 'N/A' }}</td>
+    </tr>
+    <tr>
+        <td>ADDRESS</td>
+        <td>:</td>
+        <td>{{ $transaction->customer_address ?? 'N/A' }}</td>
+    </tr>
+    <tr>
+        <td>COUNTRY</td>
+        <td>:</td>
+        <td>{{ $transaction->customer_country ?? 'N/A' }}</td>
+    </tr>
+    <tr>
+        <td>ADMIN</td>
+        <td>:</td>
+        <td>{{ $transaction->user->name ?? 'Sistem' }}</td>
+    </tr>
+</table>
 
-    </p>
 
     <!-- ITEM TABLE -->
     <table>
