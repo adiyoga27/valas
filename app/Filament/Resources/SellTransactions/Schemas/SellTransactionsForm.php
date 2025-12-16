@@ -30,10 +30,28 @@ class SellTransactionsForm
                     ->dehydrated()
                     ->label("No. Invoice"),
 
-                TextInput::make('customer_name')
+              
+   TextInput::make('customer_name')
                     ->label('Customer Name')
                     ->columnSpan(2)
-                    ->required(),
+                    ->required()->label("Nama Pelanggan"),
+                TextInput::make('passport_number')
+                    ->label('Passport Number')
+                    ->columnSpan(2)
+                    ->nullable()->label("Nomor Paspor"),
+                TextInput::make('customer_address')
+                    ->label('Customer Address')
+                    ->columnSpan(2)
+                    ->nullable()->label("Alamat Pelanggan"),
+                TextInput::make('customer_country')
+                    ->label('Customer Country')
+                    ->columnSpan(2)
+                    ->nullable()->label("Negara Pelanggan"),
+                TextInput::make('customer_birthdate')
+                    ->label('Customer Birthdate')
+                    ->columnSpan(2)
+                    ->date()
+                    ->nullable()->label("Tanggal Lahir Pelanggan"),
 
                 Textarea::make('notes')
                     ->label('Notes')
@@ -106,8 +124,8 @@ class SellTransactionsForm
                     ->dehydrated()
                     ->schema([
                         Grid::make(12)->schema([
-                            TextInput::make('name')->label('Nama Biaya')->required()->columnSpan(7),
-                            TextInput::make('amount')->label('Jumlah')->numeric()->required()->reactive()->columnSpan(5)->debounce(800)
+                            TextInput::make('name')->label('Nama Biaya')->columnSpan(7),
+                            TextInput::make('amount')->label('Jumlah')->numeric()->reactive()->columnSpan(5)->debounce(800)
                                 ->afterStateUpdated(function ($state, $set, $get) {
                                     SellTransactionsForm::updateGrandTotal($get, $set);
                                 }),

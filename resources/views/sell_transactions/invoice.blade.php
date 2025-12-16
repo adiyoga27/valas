@@ -106,10 +106,14 @@
 
     <!-- INFO -->
     <p style="margin:4px 0;">
-        Kode : {{ $transaction->transaction_code }}<br>
-        Tgl  : {{ $transaction->created_at->format('d M Y H:i') }}<br>
-        Cust : {{ $transaction->customer_name ?? 'N/A' }}<br>
-        User : {{ $transaction->user->name ?? 'Sistem' }}
+        CODE : {{ $transaction->transaction_code }}<br>
+        DATE  : {{ $transaction->created_at->format('d M Y H:i') }}<br>
+        NAME : {{ $transaction->customer_name ?? 'N/A' }}<br>
+        PASSPORT : {{ $transaction->passport_number ?? 'N/A' }}<br>
+        ADDRESS : {{ $transaction->customer_address ?? 'N/A' }}<br>
+        COUNTRY : {{ $transaction->customer_country ?? 'N/A' }}<br>
+        {{-- DATE  : {{ $transaction->customer_birthdate ? \Carbon\Carbon::parse($transaction->customer_birthdate)->format('d M Y') : 'N/A' }}< --}}
+        ADMIN : {{ $transaction->user->name ?? 'Sistem' }}
     </p>
 
     <!-- ITEM -->

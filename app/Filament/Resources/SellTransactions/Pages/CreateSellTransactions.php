@@ -36,6 +36,11 @@ class CreateSellTransactions extends CreateRecord
                 'transaction_code' => $data['transaction_code'] ?? 'SELL-' . time(),
                 'user_id' => $data['user_id'] ?? auth()->id(),
                 'customer_name' => $data['customer_name'] ?? null,
+
+                'passport_number' => $data['passport_number'] ?? null,
+                'customer_address' => $data['customer_address'] ?? null,
+                'customer_country' => $data['customer_country'] ?? null,
+                'customer_birthdate' => $data['customer_birthdate'] ?? null,
                 'notes' => $data['notes'] ?? null,
                 'total_amount' => 0,
             ]);

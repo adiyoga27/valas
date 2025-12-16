@@ -39,6 +39,19 @@ class BuyTransactionInfolist
                                 TextEntry::make('customer_name')
                                     ->label('Nama Pelanggan')
                                     ->default('N/A'),
+                                TextEntry::make('passport_number')
+                                    ->label('Nomor Paspor')
+                                    ->default('N/A'),
+                                TextEntry::make('customer_address')
+                                    ->label('Alamat Pelanggan')
+                                    ->default('N/A'),
+                                TextEntry::make('customer_country')
+                                    ->label('Negara Pelanggan')
+                                    ->default('N/A'),
+                                TextEntry::make('customer_birthdate')
+                                    ->label('Tanggal Lahir Pelanggan')
+                                    ->date('d M Y')
+                                    ->default('N/A'),   
                                 TextEntry::make('user.name')
                                     ->label('Dibuat Oleh')
                                     ->default('Sistem'),

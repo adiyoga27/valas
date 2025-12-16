@@ -44,6 +44,11 @@ class EditSellTransactions extends EditRecord
             // Update header
             $record->update([
                 'customer_name' => $data['customer_name'],
+
+                'passport_number' => $data['passport_number'] ?? null,
+                'customer_address' => $data['customer_address'] ?? null,
+                'customer_country' => $data['customer_country'] ?? null,
+                'customer_birthdate' => $data['customer_birthdate'] ?? null,
                 'notes' => $data['notes'] ?? null,
                 'additional_amounts' => $additionalAmounts,
             ]);

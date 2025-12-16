@@ -113,10 +113,15 @@
 
     <!-- INFO -->
     <p style="margin:4px 0;">
-        Kode : {{ $transaction->transaction_code }}<br>
-        Tgl  : {{ $transaction->created_at->format('d M Y H:i') }}<br>
-        Cust : {{ $transaction->customer_name ?? 'N/A' }}<br>
-        User : {{ $transaction->user->name ?? 'Sistem' }}
+        CODE : {{ $transaction->transaction_code }}<br>
+        DATE  : {{ $transaction->created_at->format('d M Y H:i') }}<br>
+        NAME : {{ $transaction->customer_name ?? 'N/A' }}<br>
+        PASSPORT : {{ $transaction->passport_number ?? 'N/A' }}<br>
+        ADDRESS : {{ $transaction->customer_address ?? 'N/A' }}<br>
+        COUNTRY : {{ $transaction->customer_country ?? 'N/A' }}<br>
+        {{-- DATE  : {{ $transaction->customer_birthdate ? \Carbon\Carbon::parse($transaction->customer_birthdate)->format('d M Y') : 'N/A' }}< --}}
+        ADMIN : {{ $transaction->user->name ?? 'Sistem' }}
+
     </p>
 
     <!-- ITEM TABLE -->
@@ -124,8 +129,8 @@
         <thead>
         <tr>
             <th style="width:20%">BN</th>
-            <th style="width:20%">JML</th>
-            <th style="width:20%" class="right">KURS</th>
+            <th style="width:20%">AMOUNT</th>
+            <th style="width:20%" class="right">RATE</th>
             <th style="width:40%" class="right">TOTAL</th>
         </tr>
         </thead>
@@ -146,7 +151,7 @@
     <!-- TOTAL -->
     <table class="totals-table">
         <tr>
-            <td class="label">Subtotal</td>
+            <td class="label">SUBTOTAL</td>
             <td class="value">{{ number_format($transaction->total_amount, 0, ',', '.') }}</td>
         </tr>
 
@@ -160,7 +165,7 @@
         @endif
 
         <tr class="grand">
-            <td class="label">TOTAL</td>
+            <td class="label">GRAND TOTAL</td>
             <td class="value">{{ number_format($transaction->grand_total, 0, ',', '.') }}</td>
         </tr>
     </table>
@@ -168,22 +173,22 @@
     <!-- NOTES -->
     @if ($transaction->notes)
         <div class="notes">
-            Catatan: {{ $transaction->notes }}
+            NOTE: {{ $transaction->notes }}
         </div>
     @endif
 
     <!-- THANK YOU -->
     <div class="center" style="margin-top:6px;">
         -------------------------<br>
-        Terima Kasih
+        THANK YOU
     </div>
 
     <!-- SIGNATURE -->
     <div class="signature">
         <table>
             <tr>
-                <td>Customer</td>
-                <td>Cashier</td>
+                <td>CUSTOMER</td>
+                <td>CASHIER</td>
             </tr>
             <tr>
                 <td>
