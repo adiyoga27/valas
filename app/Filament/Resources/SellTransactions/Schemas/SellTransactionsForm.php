@@ -47,11 +47,7 @@ class SellTransactionsForm
                     ->label('Customer Country')
                     ->columnSpan(2)
                     ->nullable()->label("Negara Pelanggan"),
-                TextInput::make('customer_birthdate')
-                    ->label('Customer Birthdate')
-                    ->columnSpan(2)
-                    ->date()
-                    ->nullable()->label("Tanggal Lahir Pelanggan"),
+               
 
                 Textarea::make('notes')
                     ->label('Notes')
