@@ -3,9 +3,14 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
+use Spatie\Activitylog\LogOptions;
+use Spatie\Activitylog\Traits\LogsActivity;
 
 class SellTransaction extends Model
 {
+     use LogsActivity;
+
+   
     protected $fillable = [
         'transaction_code',
         'user_id',
@@ -16,6 +21,13 @@ class SellTransaction extends Model
         'additional_amounts',
     ];
 
+      public function getActivitylogOptions(): LogOptions
+    {
+        return LogOptions::defaults()
+            ->logAll()
+            ->logOnlyDirty()
+            ->useLogName('buy_transaction');
+    }
     public $casts = [
         'additional_amounts' => 'array',
     ];

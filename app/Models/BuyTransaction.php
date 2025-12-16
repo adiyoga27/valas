@@ -3,9 +3,14 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
+use Spatie\Activitylog\LogOptions;
+use Spatie\Activitylog\Traits\LogsActivity;
 
 class BuyTransaction extends Model
 {
+     use LogsActivity;
+
+   
     protected $fillable = [
         'transaction_code',
         'user_id',
@@ -16,6 +21,20 @@ class BuyTransaction extends Model
         'additional_amounts'
     ];
 
+     public function getActivitylogOptions(): LogOptions
+    {
+        return LogOptions::defaults()
+            ->logAll()
+            ->logOnlyDirty()
+            ->setDescriptionForEvent(fn ($event) => match ($event) {
+                'created' => 'Create Pembelian Valas',
+                'updated' => 'Update Pembelian Valas',
+                'deleted' => 'Delete Pembelian Valas',
+                default => $event,
+            })
+            ->useLogName('buy_transaction');
+    }
+    
     public $casts = [
         'additional_amounts' => 'array',
     ];

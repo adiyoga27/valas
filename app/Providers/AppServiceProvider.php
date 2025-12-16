@@ -3,6 +3,8 @@
 namespace App\Providers;
 
 use Illuminate\Support\ServiceProvider;
+use Illuminate\Support\Facades\Request;
+use Spatie\Activitylog\Models\Activity;
 
 class AppServiceProvider extends ServiceProvider
 {
@@ -19,6 +21,12 @@ class AppServiceProvider extends ServiceProvider
      */
     public function boot(): void
     {
-        //
+        Activity::saving(function (Activity $activity) {
+        $activity->properties = $activity->properties->merge([
+            'ip'  => Request::ip(),
+            'url' => Request::fullUrl(),
+            'method' => Request::method(),
+        ]);
+    });
     }
 }
