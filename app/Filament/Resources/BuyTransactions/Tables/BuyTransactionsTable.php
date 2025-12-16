@@ -18,7 +18,7 @@ class BuyTransactionsTable
             ->columns([
                 TextColumn::make('transaction_code')->label('Kode Transaksi'),
                 TextColumn::make('customer_name')->label('Nama Pelanggan'),
-                TextColumn::make('total_amount')->money('IDR')->label('Total Amount'),
+                TextColumn::make('grand_amount')->money('IDR')->label('Total'),
                 TextColumn::make('created_at')->since()->label('Dibuat Pada'),
             ])
             ->filters([

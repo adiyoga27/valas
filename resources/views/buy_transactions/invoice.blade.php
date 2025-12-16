@@ -3,122 +3,201 @@
 <head>
     <meta charset="utf-8">
     <title>Invoice {{ $transaction->transaction_code }}</title>
+
     <style>
-        body { 
-            font-family: monospace; 
-            font-size: 10px; 
-            margin: 0; 
-            padding: 0; 
-            width: 100%; 
-        }
-        .invoice-wrapper {
-            width: 195px; /* Thermal-friendly, ±76mm paper */
-            margin: 0 auto; 
+        body {
+            font-family: monospace;
+            font-size: 10px;
+            margin: 0;
             padding: 0;
-            box-sizing: border-box;
         }
 
-        .center { text-align: center; }
-        .right { text-align: right; }
-        .bold { font-weight: bold; }
-        table { 
-            width: 100%; 
-            border-collapse: collapse; 
-            margin: 5px 0; 
+        .invoice-wrapper {
+            width: 195px; /* ±76mm */
+            margin: 0 auto;
         }
-        th, td { 
-            padding: 1px 0px; 
+
+        .center {
+            text-align: center;
+        }
+
+        .right {
+            text-align: right;
+        }
+
+        .bold {
+            font-weight: bold;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        th, td {
+            padding: 1px 0;
             vertical-align: top;
         }
-        th { text-align: left; }
-        .line { border-top: 1px dashed #000; margin: 5px 0; }
-        .notes { font-size: 9px; margin-top: 5px; }
+
+        th {
+            text-align: left;
+        }
+
+        .line {
+            border-top: 1px dashed #000;
+            margin: 4px 0;
+        }
+
+        .totals-table td {
+            padding: 1px 0;
+            font-size: 10px;
+        }
+
+        .totals-table .label {
+            text-align: left;
+        }
+
+        .totals-table .value {
+            text-align: right;
+        }
+
+        .totals-table .grand td {
+            font-weight: bold;
+            border-top: 1px dashed #000;
+            padding-top: 3px;
+            font-size: 11px;
+        }
+
+        .notes {
+            font-size: 9px;
+            margin-top: 4px;
+        }
+
+        /* SIGNATURE */
+        .signature {
+            margin-top: 12px;
+            text-align: center;
+        }
+
+        .signature table {
+            width: 100%;
+            margin-top: 6px;
+        }
+
+        .signature td {
+            text-align: center;
+            font-size: 9px;
+        }
+
+        .sign-line {
+            margin-top: 18px;
+            border-top: 1px solid #000;
+            width: 80%;
+            margin-left: auto;
+            margin-right: auto;
+        }
     </style>
 </head>
+
 <body>
-    <div class="invoice-wrapper">
-        <div class="center bold">
-            INVOICE PEMBELIAN<br>
-            -------------------------
-        </div>
+<div class="invoice-wrapper">
 
-        <p style="margin: 5px 0;">
-            Kode: {{ $transaction->transaction_code }}<br>
-            Tanggal: {{ $transaction->created_at->format('d M Y H:i:s') }}<br>
-            Customer: {{ $transaction->customer_name ?? 'N/A' }}<br>
-            Dibuat Oleh: {{ $transaction->user->name ?? 'Sistem' }}
-        </p>
-
-        <!-- Detail Item Pembelian -->
-        <table>
-            <thead>
-                <tr>
-                    <th class="left" style="width: 20%;">BN</th> 
-                    <th class="left" style="width: 20%;">AMOUNT</th>
-                    <th class="right" style="width: 20%;">RATE</th>
-                    <th class="right" style="width: 40%;">TOTAL</th>
-                </tr>
-            </thead>
-            <tbody>
-                @foreach($transaction->items as $item)
-                    <tr>
-                        <td class="left">{{ $item->currency_code }}</td>
-                        <td class="left">{{ number_format($item->qty,0,',','.') }}</td>
-                        <td class="right">{{ number_format($item->buy_rate, 0,',','.') }}</td>
-                        <td class="right">{{ number_format($item->total, 0,',','.') }}</td>
-                    </tr>
-                @endforeach
-            </tbody>
-        </table>
-
-        <div class="line"></div>
-
-        <!-- Total Item -->
-        <p class="right bold">
-            TOTAL ITEM: {{ number_format($transaction->total_amount, 0,',','.') }}
-        </p>
-
-        <!-- Biaya Tambahan Dijabarkan -->
-        @if(!empty($transaction->additional_amounts))
-            <table>
-                <thead>
-                    <tr>
-                        <th class="left" style="width: 60%;">BIAYA TAMBAHAN</th>
-                        <th class="right" style="width: 40%;">JUMLAH</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    @foreach($transaction->additional_amounts as $add)
-                        <tr>
-                            <td class="left">{{ $add['name'] }}</td>
-                            <td class="right">{{ number_format($add['amount'],0,',','.') }}</td>
-                        </tr>
-                    @endforeach
-                </tbody>
-            </table>
-
-            <!-- Total Biaya Tambahan -->
-            <p class="right bold">
-                TOTAL BIAYA TAMBAHAN: {{ number_format(collect($transaction->additional_amounts)->sum('amount'),0,',','.') }}
-            </p>
-        @endif
-
-        <!-- Grand Total -->
-        <p class="right bold">
-            GRAND TOTAL: {{ number_format($transaction->grand_total, 0,',','.') }}
-        </p>
-
-        <!-- Notes -->
-        @if($transaction->notes)
-            <p class="notes">
-                Catatan: {{ $transaction->notes }}
-            </p>
-        @endif
-
-        <div class="center" style="margin-top: 10px;">
-            -------------------------<br>
-            Terima Kasih
-        </div>
+    <!-- HEADER -->
+    <div class="center">
+        <span class="bold">{{ $office->name }}</span><br>
+        ( {{ $office->address }} )<br>
+        PHONE {{ $office->phone }}<br>
+        <span class="bold">INVOICE PEMBELIAN VALAS</span><br>
+        -------------------------
     </div>
+
+    <!-- INFO -->
+    <p style="margin:4px 0;">
+        Kode : {{ $transaction->transaction_code }}<br>
+        Tgl  : {{ $transaction->created_at->format('d M Y H:i') }}<br>
+        Cust : {{ $transaction->customer_name ?? 'N/A' }}<br>
+        User : {{ $transaction->user->name ?? 'Sistem' }}
+    </p>
+
+    <!-- ITEM TABLE -->
+    <table>
+        <thead>
+        <tr>
+            <th style="width:20%">BN</th>
+            <th style="width:20%">JML</th>
+            <th style="width:20%" class="right">KURS</th>
+            <th style="width:40%" class="right">TOTAL</th>
+        </tr>
+        </thead>
+        <tbody>
+        @foreach ($transaction->items as $item)
+            <tr>
+                <td>{{ $item->currency_code }}</td>
+                <td>{{ number_format($item->qty, 0, ',', '.') }}</td>
+                <td class="right">{{ number_format($item->buy_rate, 0, ',', '.') }}</td>
+                <td class="right">{{ number_format($item->total, 0, ',', '.') }}</td>
+            </tr>
+        @endforeach
+        </tbody>
+    </table>
+
+    <div class="line"></div>
+
+    <!-- TOTAL -->
+    <table class="totals-table">
+        <tr>
+            <td class="label">Subtotal</td>
+            <td class="value">{{ number_format($transaction->total_amount, 0, ',', '.') }}</td>
+        </tr>
+
+        @if (!empty($transaction->additional_amounts))
+            @foreach ($transaction->additional_amounts as $add)
+                <tr>
+                    <td class="label">{{ $add['name'] }}</td>
+                    <td class="value">{{ number_format($add['amount'], 0, ',', '.') }}</td>
+                </tr>
+            @endforeach
+        @endif
+
+        <tr class="grand">
+            <td class="label">TOTAL</td>
+            <td class="value">{{ number_format($transaction->grand_total, 0, ',', '.') }}</td>
+        </tr>
+    </table>
+
+    <!-- NOTES -->
+    @if ($transaction->notes)
+        <div class="notes">
+            Catatan: {{ $transaction->notes }}
+        </div>
+    @endif
+
+    <!-- THANK YOU -->
+    <div class="center" style="margin-top:6px;">
+        -------------------------<br>
+        Terima Kasih
+    </div>
+
+    <!-- SIGNATURE -->
+    <div class="signature">
+        <table>
+            <tr>
+                <td>Customer</td>
+                <td>Cashier</td>
+            </tr>
+            <tr>
+                <td>
+                    <div class="sign-line"></div>
+                    {{ $transaction->customer_name ?? '__________' }}
+                </td>
+                <td>
+                    <div class="sign-line"></div>
+                    {{ $transaction->user->name ?? 'Sistem' }}
+                </td>
+            </tr>
+        </table>
+    </div>
+
+</div>
 </body>
 </html>

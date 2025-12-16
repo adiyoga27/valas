@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Office;
 use App\Models\SellTransaction;
 use Barryvdh\DomPDF\Facade\Pdf;
 use Illuminate\Http\Request;
@@ -12,8 +13,9 @@ class SellTransactionPrintController extends Controller
     {
         $transaction = SellTransaction::with('items', 'user')->findOrFail($record);
 
-        $pdf = Pdf::loadView('buy_transactions.invoice', [
-            'transaction' => $transaction
+        $pdf = Pdf::loadView('sell_transactions.invoice', [
+            'transaction' => $transaction,
+            'office' => Office::first()
         ])
             ->setPaper([0, 0, 215.5, 1000])
             ->setOptions([

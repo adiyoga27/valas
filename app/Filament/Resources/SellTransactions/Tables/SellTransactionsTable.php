@@ -18,10 +18,10 @@ class SellTransactionsTable
     {
         return $table
             ->columns([
-                TextColumn::make('transaction_code'),
-                TextColumn::make('customer_name'),
-                TextColumn::make('total_amount')->money('IDR'),
-                TextColumn::make('created_at')->since(),
+                TextColumn::make('transaction_code')->label('Kode Transaksi')->searchable()->sortable(),
+                TextColumn::make('customer_name')->label('Nama Pelanggan')->searchable()->sortable(),
+                TextColumn::make('grand_total')->money('IDR')->label('Total'),
+                TextColumn::make('created_at')->since()->label('Dibuat Pada'),
             ])
             ->filters([
                 //

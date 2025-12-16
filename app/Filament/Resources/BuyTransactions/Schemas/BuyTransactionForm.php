@@ -85,6 +85,8 @@ class BuyTransactionForm
                                 ->numeric()
                                 ->columnSpan(2)
                                 ->reactive()
+                                
+                                ->debounce(800)
                                 ->afterStateUpdated(function ($state, $set, $get) {
                                     $set('total', $get('buy_rate') * $state);
                                     BuyTransactionForm::updateParentTotal($get, $set);
@@ -125,6 +127,8 @@ class BuyTransactionForm
                                 ->numeric()
                                 ->required()
                                 ->reactive()
+                                
+                                ->debounce(800)
                                 ->columnSpan(5)
                                 ->afterStateUpdated(function ($state, $set, $get) {
                                     BuyTransactionForm::updateGrandTotal($get, $set);

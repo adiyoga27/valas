@@ -26,7 +26,8 @@ class DatabaseSeeder extends Seeder
         ]);
 
           $this->call([
-            CurrencySeeder::class
+            CurrencySeeder::class,
+            OfficeSeeder::class,
           ]);
     }
 }

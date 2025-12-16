@@ -23,7 +23,7 @@ class SellTransactionsResource extends Resource
 {
     protected static ?string $model = SellTransaction::class;
 
-    protected static string|BackedEnum|null $navigationIcon = Heroicon::OutlinedRectangleStack;
+    protected static string|BackedEnum|null $navigationIcon = Heroicon::ShoppingCart;
 
     protected static ?string $recordTitleAttribute = 'SellTransaction';
 
