@@ -105,7 +105,12 @@
     </div>
 
     <!-- INFO -->
-<table style="width:100%; font-size:12px; border-collapse:collapse;">
+<table  style="
+    width:100%;
+    font-size:9px;
+    border-collapse:collapse;
+    font-family: Arial, sans-serif;
+">
     <tr>
         <td style="width:80px;">CODE</td>
         <td style="width:10px;">:</td>
