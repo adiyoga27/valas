@@ -9,11 +9,13 @@ use Filament\Resources\Pages\ListRecords;
 class ListCurrencies extends ListRecords
 {
     protected static string $resource = CurrencyResource::class;
+    protected ?string $heading = 'Data Master Negara'; // Gunakan $heading untuk Filament v3/v4
 
+    
     protected function getHeaderActions(): array
     {
         return [
-            CreateAction::make(),
+            CreateAction::make()->label('Tambah Data Master'),
         ];
     }
 }

@@ -18,22 +18,22 @@ class CurrenciesTable
         return $table
             ->columns([
                 TextColumn::make('code')
-                    ->searchable(),
+                    ->searchable()->label('Kode'),
                 TextColumn::make('name')
-                    ->searchable(),
-                             TextColumn::make('country_code')
-                    ->searchable(),
+                    ->searchable()->label('Nama'),
+                TextColumn::make('country_code')
+                    ->searchable()->label('Kode Negara'),
                 ImageColumn::make('flag')->label('Flag')
-                ->size(40)
-                ->disk('public'),
+                    ->size(40)
+                    ->disk('public'),
                 TextColumn::make('buy_rate')
-                    ->formatStateUsing(fn ($state) => number_format($state, 2, ',', '.'))
-                    ->sortable(),
-                    TextColumn::make('sell_rate')
-                    ->formatStateUsing(fn ($state) => number_format($state, 2, ',', '.'))
-                    ->sortable(),
+                    ->formatStateUsing(fn($state) => number_format($state, 2, ',', '.'))
+                    ->sortable()->label('Rate Beli'),
+                TextColumn::make('sell_rate')
+                    ->formatStateUsing(fn($state) => number_format($state, 2, ',', '.'))
+                    ->sortable()->label('Rate Jual'),
                 IconColumn::make('is_active')
-                    ->boolean(),
+                    ->boolean()->label('Status'),
                 TextColumn::make('created_at')
                     ->dateTime()
                     ->sortable()

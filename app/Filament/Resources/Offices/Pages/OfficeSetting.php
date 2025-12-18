@@ -24,6 +24,7 @@ class OfficeSetting extends Page implements HasForms
 
     protected static string|\UnitEnum|null $navigationGroup = 'Data Master';
     protected static string|\BackedEnum|null $navigationIcon = 'heroicon-o-building-office';
+    protected ?string $heading = 'Setting Kantor'; // Gunakan $heading untuk Filament v3/v4
 
     protected string $view = 'filament.resources.offices.pages.office-setting';
 
@@ -33,12 +34,17 @@ class OfficeSetting extends Page implements HasForms
 
     public function mount(): void
     {
-        $this->office = Office::firstOrCreate([
-            'name' => 'Default Office',
-            'address' => 'Default Address',
-            'phone' => '000-000-0000',
-        ]);
-
+        $this->office = new Office();
+        if($this->office->count() === 0) {
+            $this->office->create([
+                'name' => 'PT Monica Sejahtera',
+                'address' => 'Jl. Danau Tamblingan, Sanur, Denpasar Selatan, Kota Denpasar, Bali',
+                'phone' => '0361 289092',
+            ]);
+        }else{
+            $this->office = $this->office->first();
+        }
+  
         $this->form->fill($this->office->toArray());
     }
 
