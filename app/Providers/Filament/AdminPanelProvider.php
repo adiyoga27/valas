@@ -26,7 +26,11 @@ class AdminPanelProvider extends PanelProvider
 {
     public function panel(Panel $panel): Panel
     {
-         $office = Office::query()->first();
+        try {
+            $office = Office::query()->first();
+        } catch (\Illuminate\Database\QueryException $e) {
+            $office = null;
+        }
         return $panel
             ->default()
             ->id('admin')
