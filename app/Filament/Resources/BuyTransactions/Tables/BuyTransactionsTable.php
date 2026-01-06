@@ -21,7 +21,7 @@ class BuyTransactionsTable
             ->columns([
                 TextColumn::make('transaction_code')->label('Kode Transaksi')->searchable(),
                 TextColumn::make('customer_name')->label('Nama Pelanggan')->searchable(),
-                TextColumn::make('grand_amount')->money('IDR')->label('Total'),
+                TextColumn::make('grand_total')->money('IDR')->label('Total'),
                 TextColumn::make('created_at')->dateTime('d/m/Y H:i')->label('Dibuat Pada'),
             ])
             ->filters([
