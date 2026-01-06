@@ -8,8 +8,8 @@ use Filament\Schemas\Schema; // Keeping Schema based on UsersResource
 use Filament\Tables\Table;
 use Filament\Tables\Columns\TextColumn;
 use Spatie\Activitylog\Models\Activity;
-use Filament\Infolists\Components\KeyValue; // Standard Infolist component
-use Filament\Infolists\Components\Section; // Standard Infolist component
+// use Filament\Infolists\Components\KeyValue; // Removed
+use Filament\Schemas\Components\Section; // Correct Schema component
 use Filament\Infolists\Components\TextEntry; // Standard Infolist component
 use Filament\Actions\ViewAction; // Based on BuyTransactionsTable
 
@@ -19,11 +19,13 @@ class ActivityLogResource extends Resource
 
     protected static string|\BackedEnum|null $navigationIcon = 'heroicon-o-clipboard-document-list';
     
-    protected static string|\UnitEnum|null $navigationGroup = 'Log';
+    protected static string|\UnitEnum|null $navigationGroup = 'Tools';
     
     protected static ?string $navigationLabel = 'Log Aktivitas';
 
     protected static ?string $pluralLabel = 'Log Aktivitas';
+
+    protected static ?int $navigationSort = 999;
 
     public static function table(Table $table): Table
     {
@@ -73,15 +75,19 @@ class ActivityLogResource extends Resource
                 Section::make('Perubahan Data')
                     ->columns(2)
                     ->components([
-                        KeyValue::make('properties.old')
+                        TextEntry::make('properties.old')
                             ->label('Data Lama (Old)')
-                            ->keyLabel('Field')
-                            ->valueLabel('Value'),
+                            ->formatStateUsing(fn ($state) => 
+                                collect($state ?? [])->map(fn($v, $k) => "<strong>{$k}</strong>: {$v}")->implode('<br>')
+                            )
+                            ->html(),
                         
-                        KeyValue::make('properties.attributes')
+                        TextEntry::make('properties.attributes')
                             ->label('Data Baru (New)')
-                            ->keyLabel('Field')
-                            ->valueLabel('Value'),
+                            ->formatStateUsing(fn ($state) => 
+                                collect($state ?? [])->map(fn($v, $k) => "<strong>{$k}</strong>: {$v}")->implode('<br>')
+                            )
+                            ->html(),
                     ])
             ]);
     }

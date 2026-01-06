@@ -15,6 +15,7 @@ class UserActivityLog extends Page implements Tables\Contracts\HasTable
 
     protected static string|\BackedEnum|null $navigationIcon = 'heroicon-o-clock';
     protected static string|\UnitEnum|null $navigationGroup = 'Report';
+    protected static bool $shouldRegisterNavigation = false;
     protected static ?string $navigationLabel = 'Log User';
     protected static ?string $title = 'Log Aktivitas User';
     protected string $view = 'filament.pages.user-activity-log';
