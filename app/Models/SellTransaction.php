@@ -23,6 +23,7 @@ class SellTransaction extends Model
         'notes',
         'grand_total',
         'additional_amounts',
+        'created_at',
     ];
 
       public function getActivitylogOptions(): LogOptions
@@ -34,6 +35,7 @@ class SellTransaction extends Model
     }
     public $casts = [
         'additional_amounts' => 'array',
+        'created_at' => 'datetime',
     ];
 
     public function items()

@@ -9,6 +9,7 @@ use Filament\Forms\Components\Repeater;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
+use Filament\Forms\Components\DatePicker;
 use Filament\Schemas\Components\Grid;
 use Filament\Schemas\Schema;
 
@@ -19,11 +20,27 @@ class BuyTransactionForm
         return $schema
             ->columns(2)
             ->components([
+                DatePicker::make('created_at')
+                    ->label('Tanggal Transaksi')
+                    ->default(now())
+                    ->required()
+                    ->native(false)
+                    ->displayFormat('d/m/Y')
+                    ->columnSpan(2)
+                    ->live()
+                    ->afterStateUpdated(function ($state, $set) {
+                        if (! $state) return;
+                        $date = \Carbon\Carbon::parse($state);
+                        $today = $date->format('Ymd');
+                        $countToday = \App\Models\BuyTransaction::where('transaction_code', 'like', "BUY-{$today}%")->count() + 1;
+                        $set('transaction_code', "BUY-{$today}1000{$countToday}");
+                    }),
+
                 TextInput::make('transaction_code')
                     ->default(function () {
                         $today = now()->format('Ymd'); // TGL HARI INI tanpa spasi
                         // Hitung jumlah transaksi hari ini
-                        $countToday = \App\Models\BuyTransaction::whereDate('created_at', now())->count() + 1;
+                        $countToday = \App\Models\BuyTransaction::where('transaction_code', 'like', "BUY-{$today}%")->count() + 1;
                         return "BUY-{$today}1000{$countToday}";
                     })
                     ->disabled()

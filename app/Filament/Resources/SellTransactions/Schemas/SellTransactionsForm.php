@@ -9,6 +9,7 @@ use Filament\Forms\Components\Repeater;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
+use Filament\Forms\Components\DatePicker;
 use Filament\Schemas\Components\Grid;
 use Filament\Schemas\Schema;
 
@@ -19,10 +20,26 @@ class SellTransactionsForm
         return $schema
             ->columns(2)
             ->components([
+                DatePicker::make('created_at')
+                    ->label('Tanggal Transaksi')
+                    ->default(now())
+                    ->required()
+                    ->native(false)
+                    ->displayFormat('d/m/Y')
+                    ->columnSpan(2)
+                    ->live()
+                    ->afterStateUpdated(function ($state, $set) {
+                        if (! $state) return;
+                        $date = \Carbon\Carbon::parse($state);
+                        $today = $date->format('Ymd');
+                        $countToday = \App\Models\SellTransaction::where('transaction_code', 'like', "SELL-{$today}%")->count() + 1;
+                        $set('transaction_code', "SELL-{$today}1000{$countToday}");
+                    }),
+
                 TextInput::make('transaction_code')
                     ->default(function () {
                         $today = now()->format('Ymd');
-                        $countToday = \App\Models\SellTransaction::whereDate('created_at', now())->count() + 1;
+                        $countToday = \App\Models\SellTransaction::where('transaction_code', 'like', "SELL-{$today}%")->count() + 1;
                         return "SELL-{$today}1000{$countToday}";
                     })
                     ->disabled()

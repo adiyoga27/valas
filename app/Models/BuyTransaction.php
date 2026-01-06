@@ -22,7 +22,8 @@ class BuyTransaction extends Model
         'total_amount',
         'notes',
         'grand_total',
-        'additional_amounts'
+        'additional_amounts',
+        'created_at',
     ];
 
      public function getActivitylogOptions(): LogOptions
@@ -41,6 +42,7 @@ class BuyTransaction extends Model
     
     public $casts = [
         'additional_amounts' => 'array',
+        'created_at' => 'datetime',
     ];
     public function items()
     {
