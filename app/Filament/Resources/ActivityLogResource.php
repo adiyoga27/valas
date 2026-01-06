@@ -17,9 +17,9 @@ class ActivityLogResource extends Resource
 {
     protected static ?string $model = Activity::class;
 
-    protected static ?string $navigationIcon = 'heroicon-o-clipboard-document-list';
+    protected static string|\BackedEnum|null $navigationIcon = 'heroicon-o-clipboard-document-list';
     
-    protected static ?string $navigationGroup = 'Log';
+    protected static string|\UnitEnum|null $navigationGroup = 'Log';
     
     protected static ?string $navigationLabel = 'Log Aktivitas';
 
