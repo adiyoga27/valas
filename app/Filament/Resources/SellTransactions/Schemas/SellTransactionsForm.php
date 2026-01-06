@@ -9,7 +9,7 @@ use Filament\Forms\Components\Repeater;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
-use Filament\Forms\Components\DatePicker;
+use Filament\Forms\Components\DateTimePicker;
 use Filament\Schemas\Components\Grid;
 use Filament\Schemas\Schema;
 
@@ -20,12 +20,12 @@ class SellTransactionsForm
         return $schema
             ->columns(2)
             ->components([
-                DatePicker::make('created_at')
+                DateTimePicker::make('created_at')
                     ->label('Tanggal Transaksi')
                     ->default(now())
                     ->required()
                     ->native(false)
-                    ->displayFormat('d/m/Y')
+                    ->displayFormat('d/m/Y H:i')
                     ->columnSpan(2)
                     ->live()
                     ->afterStateUpdated(function ($state, $set) {
@@ -47,7 +47,6 @@ class SellTransactionsForm
                     ->dehydrated()
                     ->label("No. Invoice"),
 
-              
    TextInput::make('customer_name')
                     ->label('Customer Name')
                     ->columnSpan(2)

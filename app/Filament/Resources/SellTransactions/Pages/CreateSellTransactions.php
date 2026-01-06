@@ -43,6 +43,7 @@ class CreateSellTransactions extends CreateRecord
                 'customer_birthdate' => $data['customer_birthdate'] ?? null,
                 'notes' => $data['notes'] ?? null,
                 'total_amount' => 0,
+                'created_at' => $data['created_at'] ?? now(),
             ]);
             foreach ($items as $item) {
                 $itemsTotal += ($item['qty'] * $item['sell_rate']);
