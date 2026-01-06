@@ -5,15 +5,18 @@
     <title>Invoice {{ $transaction->transaction_code }}</title>
 
     <style>
+        @page {
+            margin: 0.1cm;
+        }
         body {
-            font-family: monospace;
-            font-size: 10px;
-            margin: 0;
+            font-family: 'Helvetica', 'Arial', sans-serif;
+            font-size: 12px;
+            margin: 2px;
             padding: 0;
         }
 
         .invoice-wrapper {
-            width: 195px; /* ±76mm */
+            width: 100%;
             margin: 0 auto;
         }
 
@@ -36,14 +39,14 @@
         }
 
         .line {
-            border-top: 1px dashed #000;
+            border-top: 0.1px solid #000;
             margin: 4px 0;
         }
 
         /* TOTAL */
         .totals-table td {
             padding: 1px 0;
-            font-size: 10px;
+            font-size: 12px;
         }
 
         .totals-table .label {
@@ -56,13 +59,13 @@
 
         .totals-table .grand td {
             font-weight: bold;
-            border-top: 1px dashed #000;
+            border-top: 0.1px solid #000;
             padding-top: 3px;
-            font-size: 11px;
+            font-size: 12px;
         }
 
         .notes {
-            font-size: 9px;
+            font-size: 12px;
             margin-top: 4px;
         }
 
@@ -78,12 +81,13 @@
         }
 
         .signature td {
-            font-size: 9px;
+            font-size: 12px;
             text-align: center;
+            text-transform: uppercase;
         }
 
         .sign-line {
-            margin-top: 18px;
+            margin-top: 40px;
             border-top: 1px solid #000;
             width: 80%;
             margin-left: auto;
@@ -101,16 +105,17 @@
         ( {{ $office->address }} )<br>
         PHONE {{ $office->phone }}<br>
         <span class="bold">INVOICE PENJUALAN VALAS</span><br>
-        -------------------------
+        <div class="line" style="border-top: 1px solid #000;"></div>
     </div>
 
     <!-- INFO -->
 <table  style="
    width:100%;
-    font-size:9px;
+    font-size:12px;
     border-collapse:collapse;
     font-family: Arial, sans-serif;
     font-weight: normal;
+    text-transform: uppercase;
 ">
     <tr>
              <td style="width:70px; font-weight:normal;">CODE</td>
@@ -142,22 +147,25 @@
         <td>:</td>
         <td>{{ $transaction->customer_country ?? 'N/A' }}</td>
     </tr>
-    <tr>
+    <!-- <tr>
         <td>ADMIN</td>
         <td>:</td>
         <td>{{ $transaction->user->name ?? 'Sistem' }}</td>
-    </tr>
+    </tr> -->
 </table>
 
+
+    <!-- SEPARATOR -->
+    <div class="line" style="margin: 5px 0;"></div>
 
     <!-- ITEM -->
     <table>
         <thead>
-            <tr>
-                <th style="width:20%">BN</th>
-                <th style="width:20%">JML</th>
-                <th style="width:20%" class="right">KURS</th>
-                <th style="width:40%" class="right">TOTAL</th>
+            <tr style="border-bottom: 0.1px solid #000;">
+                <th style="width:20%; padding-bottom: 4px;">BN</th>
+                <th style="width:20%; padding-bottom: 4px;">JML</th>
+                <th style="width:20%; padding-bottom: 4px;" class="right">KURS</th>
+                <th style="width:40%; padding-bottom: 4px;" class="right">TOTAL</th>
             </tr>
         </thead>
         <tbody>
@@ -172,7 +180,7 @@
         </tbody>
     </table>
 
-    <div class="line"></div>
+    {{-- <div class="line"></div> REMOVED TO AVOID DOUBLE LINE --}}
 
     <!-- TOTAL -->
     <table class="totals-table">
@@ -196,16 +204,17 @@
         </tr>
     </table>
 
+    <div class="line"></div>
+
     <!-- NOTES -->
     @if ($transaction->notes)
-        <div class="notes">
+        <div class="notes" style="margin-top: 8px;">
             Catatan: {{ $transaction->notes }}
         </div>
     @endif
 
     <!-- FOOTER -->
     <div class="center" style="margin-top:6px;">
-        -------------------------<br>
         Terima Kasih
     </div>
 
