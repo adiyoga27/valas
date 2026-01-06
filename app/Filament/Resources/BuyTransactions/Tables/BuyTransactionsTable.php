@@ -8,6 +8,9 @@ use Filament\Actions\EditAction;
 use Filament\Actions\ViewAction;
 use Filament\Schemas\Components\View;
 use Filament\Tables\Columns\TextColumn;
+use Filament\Tables\Filters\Filter;
+use Filament\Forms\Components\DatePicker;
+use Illuminate\Database\Eloquent\Builder;
 use Filament\Tables\Table;
 
 class BuyTransactionsTable
@@ -16,13 +19,30 @@ class BuyTransactionsTable
     {
         return $table
             ->columns([
-                TextColumn::make('transaction_code')->label('Kode Transaksi'),
-                TextColumn::make('customer_name')->label('Nama Pelanggan'),
+                TextColumn::make('transaction_code')->label('Kode Transaksi')->searchable(),
+                TextColumn::make('customer_name')->label('Nama Pelanggan')->searchable(),
                 TextColumn::make('grand_amount')->money('IDR')->label('Total'),
                 TextColumn::make('created_at')->dateTime('d/m/Y H:i')->label('Dibuat Pada'),
             ])
             ->filters([
-                //
+                Filter::make('created_at')
+                    ->form([
+                        DatePicker::make('start_date')
+                            ->label('Tanggal Awal'),
+                        DatePicker::make('end_date')
+                            ->label('Tanggal Akhir'),
+                    ])
+                    ->query(function (Builder $query, array $data): Builder {
+                        return $query
+                            ->when(
+                                $data['start_date'],
+                                fn (Builder $query, $date) => $query->whereDate('created_at', '>=', $date),
+                            )
+                            ->when(
+                                $data['end_date'],
+                                fn (Builder $query, $date) => $query->whereDate('created_at', '<=', $date),
+                            );
+                    })
             ])
             ->recordActions([
                 EditAction::make(),
