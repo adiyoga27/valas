@@ -33,8 +33,20 @@ class User extends Authenticatable implements FilamentUser
         return LogOptions::defaults()
             ->logOnly(['name', 'email', 'role'])
             ->logOnlyDirty()
-            ->setDescriptionForEvent(fn ($event) => "User {$event}")
+            ->setDescriptionForEvent(fn ($event) => match ($event) {
+                'created' => "Membuat Pengguna ({$this->name})",
+                'updated' => "Mengubah Pengguna ({$this->name})",
+                'deleted' => "Menghapus Pengguna ({$this->name})",
+                default => "Pengguna ({$this->name})",
+            })
             ->useLogName('user');
+    }
+
+    public function tapActivity(\Spatie\Activitylog\Models\Activity $activity, string $eventName)
+    {
+        $activity->properties = $activity->properties->merge([
+            'ip' => request()->ip(),
+        ]);
     }
     /**
      * The attributes that should be hidden for serialization.

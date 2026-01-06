@@ -26,12 +26,25 @@ class SellTransaction extends Model
         'created_at',
     ];
 
-      public function getActivitylogOptions(): LogOptions
+    public function getActivitylogOptions(): LogOptions
     {
         return LogOptions::defaults()
             ->logAll()
             ->logOnlyDirty()
-            ->useLogName('buy_transaction');
+            ->setDescriptionForEvent(fn ($event) => match ($event) {
+                'created' => "Membuat Transaksi Penjualan Valas ({$this->transaction_code})",
+                'updated' => "Mengubah Transaksi Penjualan Valas ({$this->transaction_code})",
+                'deleted' => "Menghapus Transaksi Penjualan Valas ({$this->transaction_code})",
+                default => "Transaksi Penjualan Valas ({$this->transaction_code})",
+            })
+            ->useLogName('sell_transaction');
+    }
+
+    public function tapActivity(\Spatie\Activitylog\Models\Activity $activity, string $eventName)
+    {
+        $activity->properties = $activity->properties->merge([
+            'ip' => request()->ip(),
+        ]);
     }
     public $casts = [
         'additional_amounts' => 'array',

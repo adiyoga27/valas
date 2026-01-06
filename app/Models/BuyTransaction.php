@@ -32,12 +32,19 @@ class BuyTransaction extends Model
             ->logAll()
             ->logOnlyDirty()
             ->setDescriptionForEvent(fn ($event) => match ($event) {
-                'created' => 'Create Pembelian Valas',
-                'updated' => 'Update Pembelian Valas',
-                'deleted' => 'Delete Pembelian Valas',
-                default => $event,
+                'created' => "Membuat Transaksi Pembelian Valas ({$this->transaction_code})",
+                'updated' => "Mengubah Transaksi Pembelian Valas ({$this->transaction_code})",
+                'deleted' => "Menghapus Transaksi Pembelian Valas ({$this->transaction_code})",
+                default => "Transaksi Pembelian Valas ({$this->transaction_code})",
             })
             ->useLogName('buy_transaction');
+    }
+
+    public function tapActivity(\Spatie\Activitylog\Models\Activity $activity, string $eventName)
+    {
+        $activity->properties = $activity->properties->merge([
+            'ip' => request()->ip(),
+        ]);
     }
     
     public $casts = [
