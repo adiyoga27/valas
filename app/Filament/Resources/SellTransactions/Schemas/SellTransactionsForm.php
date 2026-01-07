@@ -54,7 +54,7 @@ class SellTransactionsForm
                 TextInput::make('passport_number')
                     ->label('Passport Number')
                     ->columnSpan(2)
-                    ->nullable()->label("Nomor Paspor"),
+                    ->nullable()->label("Nomor Passport / KTP"),
                 TextInput::make('customer_address')
                     ->label('Customer Address')
                     ->columnSpan(2)
