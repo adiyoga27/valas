@@ -67,7 +67,7 @@ class BuyTransactionInfolist
                                                     ->columnSpan(1),
                                                 TextEntry::make('buy_rate')
                                                     ->label('Kurs Beli')
-                                                    ->money('IDR', 2) // Asumsi kurs ditampilkan sebagai IDR
+                                                    ->money('IDR') // Asumsi kurs ditampilkan sebagai IDR
                                                     ->columnSpan(1),
                                                 TextEntry::make('total')
                                                     ->label('Subtotal (IDR)')
