@@ -14,6 +14,10 @@ return [
     |
     */
 
+    'opensanctions' => [
+        'api_key' => env('OPENSANCTIONS_API_KEY'),
+    ],
+
     'postmark' => [
         'key' => env('POSTMARK_API_KEY'),
     ],

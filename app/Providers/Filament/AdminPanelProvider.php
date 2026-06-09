@@ -71,6 +71,9 @@ class AdminPanelProvider extends PanelProvider
 
             NavigationGroup::make()
                 ->label('Tools'),
+
+            NavigationGroup::make()
+                ->label('PEP & DTTOT'),
         ])
             ->authMiddleware([
                 Authenticate::class,
