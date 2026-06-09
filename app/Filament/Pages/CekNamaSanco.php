@@ -304,8 +304,8 @@ class CekNamaSanco extends Page implements Forms\Contracts\HasForms
             'id' => $item->entity_id,
             'caption' => $item->name,
             'schema' => $item->schema ?? '-',
-            'datasets' => $item->dataset_name,
-            'dataset_title' => $dataset?->title,
+            'datasets' => $dataset?->title ?? $item->dataset_name,
+            'dataset_name' => $item->dataset_name,
             'country' => $item->countries ?? '-',
             'birth_date' => $item->birth_date ?? '-',
             'aliases' => $item->aliases,
@@ -322,7 +322,7 @@ class CekNamaSanco extends Page implements Forms\Contracts\HasForms
             'last_seen' => $item->last_seen,
             'last_change' => $item->last_change,
             'opensanctions_url' => "https://www.opensanctions.org/entities/{$item->entity_id}",
-            'detail_url' => \App\Filament\Pages\DetailSancoEntity::getUrl(['entityId' => $item->entity_id]),
+            'detail_url' => route('sanco.entity.show', $item->entity_id),
         ];
     }
 
