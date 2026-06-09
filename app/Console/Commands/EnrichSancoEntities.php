@@ -49,20 +49,22 @@ class EnrichSancoEntities extends Command
 
         $this->info("Enriching: {$datasetName}...");
 
-        // Build set of existing entity IDs
-        $this->info("  Loading entity IDs...");
-        $entityIds = DB::table('sanco_entities')
+        // Count existing entities (don't load all IDs into memory)
+        $count = DB::table('sanco_entities')
             ->where('dataset_name', $datasetName)
-            ->pluck('entity_id')
-            ->flip()
-            ->toArray();
+            ->count();
 
-        if (empty($entityIds)) {
+        if ($count === 0) {
             $this->warn("  Tidak ada entitas untuk dataset ini. Import dulu dengan sanco:import-entities.");
             return;
         }
 
-        $this->info("  " . count($entityIds) . " entity IDs loaded.");
+        $this->info("  {$count} entities exist. Building lookup index...");
+
+        DB::statement('CREATE TEMPORARY TABLE sanco_enrich_lookup (entity_id VARCHAR(255) PRIMARY KEY) ENGINE=InnoDB');
+        DB::statement("INSERT INTO sanco_enrich_lookup (entity_id) SELECT entity_id FROM sanco_entities WHERE dataset_name = ?", [$datasetName]);
+
+        $this->info("  Lookup index ready.");
 
         $this->info("  Downloading FTM file ({$ftm['url']})...");
         $tmpFile = sys_get_temp_dir() . DIRECTORY_SEPARATOR . 'sanco_ftm_' . uniqid() . '.json';
@@ -74,7 +76,7 @@ class EnrichSancoEntities extends Command
 
         $ch = curl_init($ftm['url']);
         curl_setopt_array($ch, [
-            CURLOPT_TIMEOUT => 600,
+            CURLOPT_TIMEOUT => 3600,
             CURLOPT_FILE => $fh,
             CURLOPT_FOLLOWLOCATION => true,
             CURLOPT_USERAGENT => 'ValasEnricher/1.0',
@@ -110,20 +112,45 @@ class EnrichSancoEntities extends Command
             $entityId = $obj['id'] ?? '';
 
             if (!in_array($schema, ['Person', 'Organization'])) continue;
-            if (!isset($entityIds[$entityId])) continue;
+
+            // Check if entity exists in our DB (using temp table)
+            $exists = DB::table('sanco_enrich_lookup')
+                ->where('entity_id', $entityId)
+                ->exists();
+
+            if (!$exists) continue;
 
             $props = $obj['properties'] ?? [];
+
             $aliases = isset($props['alias']) ? implode('; ', $props['alias']) : null;
             $weakAliases = isset($props['weakAlias']) ? implode('; ', $props['weakAlias']) : null;
+            $birthPlace = isset($props['birthPlace']) ? implode('; ', $props['birthPlace']) : null;
+            $gender = isset($props['gender']) ? implode('; ', $props['gender']) : null;
+            $nationality = isset($props['nationality']) ? implode('; ', $props['nationality']) : null;
+            $position = isset($props['position']) ? implode('; ', $props['position']) : null;
+            $notes = isset($props['notes']) ? implode('; ', $props['notes']) : null;
 
-            if ($aliases || $weakAliases) {
+            // Store all non-empty properties as JSON for future use
+            $propJson = [];
+            $extraFields = ['birthPlace','gender','nationality','position','notes','website','wikidataId','wikipediaUrl','sourceUrl','education','religion','political','citizenship','firstName','lastName','fatherName','motherName','topics','program'];
+            foreach ($extraFields as $f) {
+                if (!empty($props[$f])) $propJson[$f] = $props[$f];
+            }
+
+            $update = ['updated_at' => now()->toDateTimeString()];
+            if ($aliases) $update['aliases'] = $aliases;
+            if ($weakAliases) $update['weak_aliases'] = $weakAliases;
+            if ($birthPlace) $update['birth_place'] = $birthPlace;
+            if ($gender) $update['gender'] = $gender;
+            if ($nationality) $update['nationality'] = $nationality;
+            if ($position) $update['position'] = $position;
+            if ($notes) $update['notes'] = $notes;
+            if (!empty($propJson)) $update['properties'] = json_encode($propJson);
+
+            if (count($update) > 1) { // More than just updated_at
                 DB::table('sanco_entities')
                     ->where('entity_id', $entityId)
-                    ->update([
-                        'aliases' => $aliases,
-                        'weak_aliases' => $weakAliases,
-                        'updated_at' => now()->toDateTimeString(),
-                    ]);
+                    ->update($update);
                 $enriched++;
             }
 
@@ -136,6 +163,8 @@ class EnrichSancoEntities extends Command
 
         fclose($handle);
         unlink($tmpFile);
+
+        DB::statement('DROP TEMPORARY TABLE IF EXISTS sanco_enrich_lookup');
 
         $this->info("  Done! Processed {$processed} lines, enriched {$enriched} entities.");
     }

@@ -36,8 +36,6 @@ class CekNamaSanco extends Page implements Forms\Contracts\HasForms
 
     public ?string $source = null;
 
-    public ?array $selectedEntity = null;
-
     public function getTotalEntities(): int
     {
         try {
@@ -84,16 +82,6 @@ class CekNamaSanco extends Page implements Forms\Contracts\HasForms
         ];
     }
 
-    public function showDetail(int $index): void
-    {
-        $this->selectedEntity = $this->results[$index] ?? null;
-    }
-
-    public function closeDetail(): void
-    {
-        $this->selectedEntity = null;
-    }
-
     public function search(): void
     {
         if (blank($this->keyword) || strlen($this->keyword) < 2) {
@@ -125,17 +113,18 @@ class CekNamaSanco extends Page implements Forms\Contracts\HasForms
                 return;
             }
 
-            $this->source = 'lokal';
             $results = $this->doSearch($keyword);
+            $this->results = $this->mergeDuplicates($results->all());
 
-            if ($results->isEmpty()) {
+            if (empty($this->results)) {
                 $results = $this->doFuzzySearch($keyword);
-                if ($results->isNotEmpty()) {
+                $this->results = $this->mergeDuplicates($results->all());
+                if (!empty($this->results)) {
                     $this->source = 'lokal (fuzzy)';
                 }
+            } else {
+                $this->source = 'lokal';
             }
-
-            $this->results = $results->all();
 
             if (empty($this->results)) {
                 $this->notify('warning', 'Nama tidak ditemukan. Coba gunakan nama lengkap.');
@@ -144,6 +133,44 @@ class CekNamaSanco extends Page implements Forms\Contracts\HasForms
         } catch (\Exception $e) {
             $this->error = null;
         }
+    }
+
+    protected function mergeDuplicates(array $results): array
+    {
+        $grouped = [];
+
+        foreach ($results as $row) {
+            $id = $row['id'];
+            if (!isset($grouped[$id])) {
+                $grouped[$id] = $row;
+            } else {
+                $existing = $grouped[$id];
+                // Merge datasets
+                $existingTags = collect(explode(', ', $existing['datasets']))->filter()->unique();
+                $newTags = collect(explode(', ', $row['datasets']))->filter()->unique();
+                $grouped[$id]['datasets'] = $existingTags->merge($newTags)->unique()->sort()->implode(', ');
+
+                // Keep the longest/richest name
+                if (strlen($row['caption']) > strlen($existing['caption'])) {
+                    $grouped[$id]['caption'] = $row['caption'];
+                }
+                // Merge aliases
+                if (!empty($row['aliases'])) {
+                    $grouped[$id]['aliases'] = trim(($existing['aliases'] ?? '') . '; ' . $row['aliases'], '; ');
+                }
+                if (!empty($row['weak_aliases'])) {
+                    $grouped[$id]['weak_aliases'] = trim(($existing['weak_aliases'] ?? '') . '; ' . $row['weak_aliases'], '; ');
+                }
+                // Keep the most complete data
+                foreach (['birth_date', 'birth_place', 'gender', 'nationality', 'country'] as $f) {
+                    if (($existing[$f] ?? '-') === '-' && ($row[$f] ?? '-') !== '-') {
+                        $grouped[$id][$f] = $row[$f];
+                    }
+                }
+            }
+        }
+
+        return array_values($grouped);
     }
 
     protected function doFuzzySearch(string $keyword): \Illuminate\Support\Collection
@@ -262,7 +289,7 @@ class CekNamaSanco extends Page implements Forms\Contracts\HasForms
                     );
                 }
             })
-            ->limit(30)
+            ->limit(60)
             ->get()
             ->map(fn($item) => $this->formatResult($item));
 
@@ -283,6 +310,11 @@ class CekNamaSanco extends Page implements Forms\Contracts\HasForms
             'birth_date' => $item->birth_date ?? '-',
             'aliases' => $item->aliases,
             'weak_aliases' => $item->weak_aliases,
+            'birth_place' => $item->birth_place,
+            'gender' => $item->gender,
+            'nationality' => $item->nationality,
+            'position' => $item->position,
+            'notes' => $item->notes,
             'addresses' => $item->addresses,
             'identifiers' => $item->identifiers,
             'emails' => $item->emails,
@@ -290,6 +322,7 @@ class CekNamaSanco extends Page implements Forms\Contracts\HasForms
             'last_seen' => $item->last_seen,
             'last_change' => $item->last_change,
             'opensanctions_url' => "https://www.opensanctions.org/entities/{$item->entity_id}",
+            'detail_url' => \App\Filament\Pages\DetailSancoEntity::getUrl(['entityId' => $item->entity_id]),
         ];
     }
 
