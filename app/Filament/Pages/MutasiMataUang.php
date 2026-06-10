@@ -75,10 +75,36 @@ class MutasiMataUang extends Page implements Forms\Contracts\HasForms
     protected function getHeaderActions(): array
     {
         return [
+            Action::make('export_pdf')
+                ->label('Export PDF')
+                ->icon('heroicon-o-document-arrow-down')
+                ->color('danger')
+                ->action(function () {
+                    $this->loadData();
+                    $pdf = \Barryvdh\DomPDF\Facade\Pdf::loadView('exports.mutasi-mata-uang', [
+                        'groupedMutations' => $this->groupedMutations,
+                        'startDate' => $this->startDate,
+                        'endDate' => $this->endDate,
+                    ]);
+                    return response()->streamDownload(fn () => print($pdf->output()), 'mutasi-mata-uang-' . date('YmdHis') . '.pdf');
+                }),
+
+            Action::make('export_excel')
+                ->label('Export Excel')
+                ->icon('heroicon-o-table-cells')
+                ->color('success')
+                ->action(function () {
+                    $this->loadData();
+                    return \Maatwebsite\Excel\Facades\Excel::download(
+                        new \App\Exports\MutasiMataUangExport($this->groupedMutations, $this->startDate, $this->endDate), 
+                        'mutasi-mata-uang-' . date('YmdHis') . '.xlsx'
+                    );
+                }),
+
             Action::make('submit')
                 ->label('Submit Filter')
                 ->icon('heroicon-o-funnel')
-                ->color('danger')
+                ->color('primary')
                 ->action(fn () => $this->loadData()),
         ];
     }

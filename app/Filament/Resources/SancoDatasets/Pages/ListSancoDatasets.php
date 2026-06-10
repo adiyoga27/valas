@@ -4,7 +4,6 @@ namespace App\Filament\Resources\SancoDatasets\Pages;
 
 use App\Filament\Resources\SancoDatasets\SancoDatasetResource;
 use App\Filament\Pages\CekNamaSanco;
-use App\Services\SancoImporter;
 use Filament\Actions\Action;
 use Filament\Resources\Pages\ListRecords;
 use Illuminate\Support\Facades\Artisan;
@@ -27,7 +26,6 @@ class ListSancoDatasets extends ListRecords
                 ->icon('heroicon-o-cloud-arrow-down')
                 ->color('success')
                 ->action(function () {
-                    $importer = new SancoImporter();
                     $datasets = \App\Models\SancoDataset::whereJsonContains('tags', 'sanctions')
                         ->pluck('name')
                         ->toArray();
@@ -37,23 +35,32 @@ class ListSancoDatasets extends ListRecords
                         return;
                     }
 
-                    $this->notify('info', 'Memulai import ' . count($datasets) . ' dataset...');
+                    $artisan = base_path('artisan');
+                    $logFile = storage_path('logs/sanco-import.log');
+                    $count = count($datasets);
 
-                    foreach ($datasets as $name) {
-                        $result = $importer->importDataset($name);
-                        if (isset($result['error'])) {
-                            $this->notify('warning', "{$name}: {$result['error']}");
-                        } else {
-                            $this->notify('success', "{$name}: {$result['total']} entitas berhasil diimport!");
-                        }
+                    if (strtoupper(substr(PHP_OS, 0, 3)) === 'WIN') {
+                        $cmd = sprintf(
+                            'start /B php "%s" sanco:import-entities --tag=sanctions > "%s" 2>&1',
+                            $artisan,
+                            $logFile
+                        );
+                    } else {
+                        $cmd = sprintf(
+                            'nohup php "%s" sanco:import-entities --tag=sanctions >> "%s" 2>&1 &',
+                            $artisan,
+                            $logFile
+                        );
                     }
 
-                    $this->notify('success', 'Import entitas selesai! Reload halaman.');
-                    $this->resetTable();
+                    pclose(popen($cmd, 'r'));
+
+                    $this->notify('success', "Import {$count} dataset dimulai di background. Cek log: storage/logs/sanco-import.log");
+                    $this->redirect(ListSancoDatasets::getUrl());
                 })
                 ->requiresConfirmation()
                 ->modalHeading('Import Data Entitas')
-                ->modalDescription('Ini akan mendownload dan mengimport data sanctions (OFAC, UN, EU, UK). Untuk dataset PEP (1.9M entitas), gunakan CLI: php artisan sanco:import-entities peps')
+                ->modalDescription('Import akan berjalan di background (hindari gateway timeout). Cek progress di storage/logs/sanco-import.log. Untuk dataset PEP (1.9M entitas), gunakan CLI: php artisan sanco:import-entities peps')
                 ->modalSubmitActionLabel('Ya, Import'),
 
             Action::make('sync')
