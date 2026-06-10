@@ -3,6 +3,7 @@
 namespace App\Filament\Resources\BuyTransactions\Schemas;
 
 use App\Models\Currency;
+use App\Models\SancoEntity;
 use Filament\Forms\Components\Hidden;
 use Filament\Forms\Components\Placeholder;
 use Filament\Forms\Components\Repeater;
@@ -53,7 +54,44 @@ class BuyTransactionForm
                 TextInput::make('customer_name')
                     ->label('Customer Name')
                     ->columnSpan(2)
-                    ->required()->label("Nama Pelanggan"),
+                    ->required()->label("Nama Pelanggan")
+                    ->live(debounce: 500)
+                    ->afterStateUpdated(function ($state, callable $set) {
+                        if (empty(trim($state ?? '')) || strlen(trim($state)) < 2) {
+                            $set('_pep_matches', null);
+                            return;
+                        }
+                        $matches = SancoEntity::where('name', 'like', '%' . trim($state) . '%')
+                            ->select('name', 'dataset_title', 'entity_id')
+                            ->limit(10)
+                            ->get()
+                            ->map(fn ($e) => [
+                                'name' => $e->name,
+                                'dataset' => $e->dataset_title ?? $e->dataset_name ?? '-',
+                                'entity_id' => $e->entity_id,
+                            ])
+                            ->toArray();
+                        $set('_pep_matches', $matches);
+                    }),
+                Placeholder::make('_pep_display')
+                    ->label('Daftar Nama PEP/DTTOT')
+                    ->content(function (callable $get) {
+                        $matches = $get('_pep_matches');
+                        if (empty($matches)) return '';
+
+                        $html = '<div style="max-height:200px;overflow-y:auto;border:1px solid #e5e7eb;border-radius:6px;padding:8px;background:#fef2f2;font-size:13px;">';
+                        foreach ($matches as $m) {
+                            $url = route('sanco.entity.show', $m['entity_id']);
+                            $html .= '<div style="padding:4px 0;border-bottom:1px solid #fecaca;">';
+                            $html .= '<a href="' . $url . '" target="_blank" style="font-weight:600;color:#dc2626;text-decoration:none;">' . e($m['name']) . '</a>';
+                            $html .= ' <span style="color:#6b7280;font-size:11px;">(' . e($m['dataset']) . ')</span>';
+                            $html .= '</div>';
+                        }
+                        $html .= '</div>';
+                        return new \Illuminate\Support\HtmlString($html);
+                    })
+                    ->columnSpan(2)
+                    ->visible(fn (callable $get) => !empty($get('_pep_matches'))),
                 TextInput::make('passport_number')
                     ->label('Passport Number')
                     ->columnSpan(2)
