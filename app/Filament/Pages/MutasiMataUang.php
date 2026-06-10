@@ -28,9 +28,9 @@ class MutasiMataUang extends Page implements Forms\Contracts\HasForms
     public ?int $currencyId = null;
     public ?string $keyword = null;
 
-    public array $mutations = [];
-    public array $balances = [];
+    public array $groupedMutations = [];
     public bool $searched = false;
+    public int $totalRecords = 0;
 
     public function mount(): void
     {
@@ -76,9 +76,9 @@ class MutasiMataUang extends Page implements Forms\Contracts\HasForms
     {
         return [
             Action::make('submit')
-                ->label('Tampilkan')
-                ->icon('heroicon-o-magnifying-glass')
-                ->color('primary')
+                ->label('Submit Filter')
+                ->icon('heroicon-o-funnel')
+                ->color('danger')
                 ->action(fn () => $this->loadData()),
         ];
     }
@@ -86,11 +86,22 @@ class MutasiMataUang extends Page implements Forms\Contracts\HasForms
     public function loadData(): void
     {
         $this->searched = true;
-        $this->mutations = [];
-        $this->balances = [];
+        $this->groupedMutations = [];
+        $this->totalRecords = 0;
 
         $start = Carbon::parse($this->startDate)->startOfDay();
         $end = Carbon::parse($this->endDate)->endOfDay();
+
+        // Query for previous balances
+        $buyBefore = DB::table('buy_transaction_items as bti')
+            ->join('buy_transactions as bt', 'bti.buy_transaction_id', '=', 'bt.id')
+            ->select('bti.currency_code', DB::raw('SUM(bti.qty) as total_buy'))
+            ->where('bt.created_at', '<', $start);
+            
+        $sellBefore = DB::table('sell_transaction_items as sti')
+            ->join('sell_transactions as st', 'sti.sell_transaction_id', '=', 'st.id')
+            ->select('sti.currency_code', DB::raw('SUM(sti.qty) as total_sell'))
+            ->where('st.created_at', '<', $start);
 
         $buyQuery = DB::table('buy_transaction_items as bti')
             ->join('buy_transactions as bt', 'bti.buy_transaction_id', '=', 'bt.id')
@@ -125,10 +136,15 @@ class MutasiMataUang extends Page implements Forms\Contracts\HasForms
         if ($this->currencyId) {
             $currency = Currency::find($this->currencyId);
             if ($currency) {
+                $buyBefore->where('bti.currency_code', $currency->code);
+                $sellBefore->where('sti.currency_code', $currency->code);
                 $buyQuery->where('bti.currency_code', $currency->code);
                 $sellQuery->where('sti.currency_code', $currency->code);
             }
         }
+
+        $bbBuy = $buyBefore->groupBy('bti.currency_code')->pluck('total_buy', 'currency_code');
+        $bbSell = $sellBefore->groupBy('sti.currency_code')->pluck('total_sell', 'currency_code');
 
         $union = $buyQuery->unionAll($sellQuery);
         $raw = DB::table(DB::raw("({$union->toSql()}) as m"))
@@ -146,27 +162,45 @@ class MutasiMataUang extends Page implements Forms\Contracts\HasForms
             );
         }
 
-        $stock = [];
+        $activeRates = Currency::where('is_active', true)->pluck('buy_rate', 'code');
+        
+        $mutationsByCurrency = [];
+
+        // First, initialize the currencies that have mutations in this period
         foreach ($raw as $r) {
             $code = $r->currency_code;
-            if (!isset($stock[$code])) $stock[$code] = 0;
-            $stock[$code] += $r->buy_qty - $r->sell_qty;
+            if (!isset($mutationsByCurrency[$code])) {
+                $mutationsByCurrency[$code] = [
+                    'currency_code' => $code,
+                    'currency_name' => $r->currency_name,
+                    'beginning_balance' => ($bbBuy[$code] ?? 0) - ($bbSell[$code] ?? 0),
+                    'current_stock' => ($bbBuy[$code] ?? 0) - ($bbSell[$code] ?? 0),
+                    'total_buy' => 0,
+                    'total_sell' => 0,
+                    'rate' => $activeRates[$code] ?? 0,
+                    'items' => []
+                ];
+            }
+            
+            $mutationsByCurrency[$code]['current_stock'] += $r->buy_qty - $r->sell_qty;
+            $mutationsByCurrency[$code]['total_buy'] += $r->buy_qty;
+            $mutationsByCurrency[$code]['total_sell'] += $r->sell_qty;
 
-            $this->mutations[] = [
-                'currency_code' => $r->currency_code,
-                'currency_name' => $r->currency_name,
-                'date'         => Carbon::parse($r->date)->format('d/m/Y H:i'),
+            $mutationsByCurrency[$code]['items'][] = [
+                'date'         => Carbon::parse($r->date)->format('j F Y'),
                 'trx_code'     => $r->transaction_code,
-                'buy'          => $r->buy_qty > 0 ? number_format($r->buy_qty, 2, ',', '.') : '-',
-                'sell'         => $r->sell_qty > 0 ? number_format($r->sell_qty, 2, ',', '.') : '-',
-                'rate'         => number_format($r->rate, 2, ',', '.'),
-                'rate_raw'     => $r->rate,
-                'stock'        => $stock[$code],
-                'valuation'    => $stock[$code] * $r->rate,
+                'customer'     => $r->customer_name ?? 'Head Office', // Assuming Branch/Customer column
+                'buy'          => $r->buy_qty,
+                'sell'         => $r->sell_qty,
+                'rate'         => $r->rate,
+                'stock'        => $mutationsByCurrency[$code]['current_stock'],
+                'valuation'    => $mutationsByCurrency[$code]['current_stock'] * $r->rate,
                 'type'         => $r->type,
             ];
+            
+            $this->totalRecords++;
         }
 
-        $this->balances = $stock;
+        $this->groupedMutations = $mutationsByCurrency;
     }
 }
