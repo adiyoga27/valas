@@ -65,4 +65,11 @@ class BuyTransaction extends Model
     {
         return $this->hasOne(BuyTransactionCdd::class);
     }
+
+    public static function generateCode(): string
+    {
+        $today = now()->format('Ymd');
+        $countToday = self::where('transaction_code', 'like', "BUY-{$today}%")->count() + 1;
+        return "BUY-{$today}1000{$countToday}";
+    }
 }

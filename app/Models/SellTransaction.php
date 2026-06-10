@@ -60,4 +60,11 @@ class SellTransaction extends Model
     {
         return $this->belongsTo(User::class);
     }
+
+    public static function generateCode(): string
+    {
+        $today = now()->format('Ymd');
+        $countToday = self::where('transaction_code', 'like', "SELL-{$today}%")->count() + 1;
+        return "SELL-{$today}1000{$countToday}";
+    }
 }
