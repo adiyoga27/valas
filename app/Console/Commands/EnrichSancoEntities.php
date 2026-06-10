@@ -103,8 +103,8 @@ class EnrichSancoEntities extends Command
         curl_setopt_array($ch, [
             CURLOPT_TIMEOUT => 3600,
             CURLOPT_CONNECTTIMEOUT => 60,
-            CURLOPT_LOW_SPEED_LIMIT => 1024,
-            CURLOPT_LOW_SPEED_TIME => 30,
+            CURLOPT_LOW_SPEED_LIMIT => 1,
+            CURLOPT_LOW_SPEED_TIME => 300,
             CURLOPT_FILE => $fh,
             CURLOPT_FOLLOWLOCATION => true,
             CURLOPT_USERAGENT => 'ValasEnricher/1.0',

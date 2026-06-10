@@ -304,7 +304,7 @@ class CekNamaSanco extends Page implements Forms\Contracts\HasForms
             'id' => $item->entity_id,
             'caption' => $item->name,
             'schema' => $item->schema ?? '-',
-            'datasets' => $dataset?->title ?? $item->dataset_name,
+            'datasets' => $item->dataset_title ?? $dataset?->title ?? $item->dataset_name,
             'dataset_name' => $item->dataset_name,
             'country' => $item->countries ?? '-',
             'birth_date' => $item->birth_date ?? '-',

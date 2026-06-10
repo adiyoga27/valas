@@ -117,7 +117,8 @@
                                     <td class="font-monospace small">{{ $entity->entity_id }}</td>
                                     <td class="small">{{ $entity->first_seen ? \Carbon\Carbon::parse($entity->first_seen)->format('d M Y') : '-' }}</td>
                                     <td class="small">{{ $entity->last_change ? \Carbon\Carbon::parse($entity->last_change)->format('d M Y') : '-' }}</td>
-                                    <td class="small">{{ $dataset?->title ?? $entity->dataset_name }}</td>
+                                     <td class="small">{{ $entity->dataset_title ?? $dataset?->title ?? $entity->dataset_name }}</td>
+
                                 </tr>
                             </tbody>
                         </table>

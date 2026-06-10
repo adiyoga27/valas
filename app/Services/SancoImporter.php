@@ -84,6 +84,7 @@ class SancoImporter
             $rows[] = [
                 'entity_id' => $line[$idIdx] ?? '',
                 'dataset_name' => $datasetName,
+                'dataset_title' => $dataset->title,
                 'schema' => $line[$schemaIdx] ?? null,
                 'name' => $line[$nameIdx] ?? '',
                 'aliases' => $line[$aliasesIdx] ?? null,
