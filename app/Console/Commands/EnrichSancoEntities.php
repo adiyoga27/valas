@@ -77,14 +77,34 @@ class EnrichSancoEntities extends Command
         $ch = curl_init($ftm['url']);
         curl_setopt_array($ch, [
             CURLOPT_TIMEOUT => 3600,
+            CURLOPT_CONNECTTIMEOUT => 30,
+            CURLOPT_LOW_SPEED_LIMIT => 1024,
+            CURLOPT_LOW_SPEED_TIME => 30,
             CURLOPT_FILE => $fh,
             CURLOPT_FOLLOWLOCATION => true,
             CURLOPT_USERAGENT => 'ValasEnricher/1.0',
             CURLOPT_FAILONERROR => true,
+            CURLOPT_SSL_VERIFYPEER => false,
+            CURLOPT_BUFFERSIZE => 65536,
         ]);
-        curl_exec($ch);
-        $httpCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
-        $curlError = curl_error($ch);
+
+        $maxRetries = 3;
+        for ($attempt = 1; $attempt <= $maxRetries; $attempt++) {
+            $this->info("  Download attempt {$attempt}/{$maxRetries}...");
+            curl_exec($ch);
+            $httpCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
+            $curlError = curl_error($ch);
+            $downloaded = curl_getinfo($ch, CURLINFO_SIZE_DOWNLOAD);
+
+            if ($httpCode === 200 && empty($curlError)) {
+                break;
+            }
+
+            if ($attempt < $maxRetries) {
+                $this->warn("  Retrying in 5s... ({$curlError})");
+                sleep(5);
+            }
+        }
         curl_close($ch);
         fclose($fh);
 
