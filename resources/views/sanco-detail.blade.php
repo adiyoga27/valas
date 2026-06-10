@@ -167,7 +167,7 @@
                             <li class="list-group-item d-flex justify-content-between align-items-start py-3">
                                 <div class="ms-2 me-auto">
                                     <div class="fw-bold text-muted small text-uppercase">Dataset Source</div>
-                                    <span class="text-dark">{{ $entity->dataset_title ?? $dataset?->title ?? $entity->dataset_name }}</span>
+                                    <span class="text-dark">{{ $dataset_titles }}</span>
                                 </div>
                             </li>
                             <li class="list-group-item d-flex justify-content-between align-items-start py-3">

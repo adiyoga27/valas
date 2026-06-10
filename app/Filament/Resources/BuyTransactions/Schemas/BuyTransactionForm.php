@@ -61,25 +61,45 @@ class BuyTransactionForm
                             $set('_pep_matches', null);
                             return;
                         }
-                        $matches = SancoEntity::where('name', 'like', '%' . trim($state) . '%')
-                            ->select('name', 'dataset_title', 'entity_id')
-                            ->limit(10)
-                            ->get()
-                            ->map(fn ($e) => [
+
+                        $entities = SancoEntity::where('name', 'like', '%' . trim($state) . '%')
+                            ->select('name', 'entity_id', 'dataset_title', 'dataset_name')
+                            ->orderBy('entity_id')
+                            ->limit(50)
+                            ->get();
+
+                        $result = [];
+                        $seen = [];
+
+                        foreach ($entities as $e) {
+                            if (isset($seen[$e->entity_id])) continue;
+                            $seen[$e->entity_id] = true;
+
+                            $result[] = [
                                 'name' => $e->name,
                                 'dataset' => $e->dataset_title ?? $e->dataset_name ?? '-',
                                 'entity_id' => $e->entity_id,
-                            ])
-                            ->toArray();
-                        $set('_pep_matches', $matches);
+                            ];
+                        }
+
+                        $set('_pep_matches', array_slice($result, 0, 10));
                     }),
                 Placeholder::make('_pep_display')
-                    ->label('Daftar Nama PEP/DTTOT')
+                    ->label('PEP/DTTOT Check')
                     ->content(function (callable $get) {
                         $matches = $get('_pep_matches');
-                        if (empty($matches)) return '';
 
-                        $html = '<div style="max-height:200px;overflow-y:auto;border:1px solid #e5e7eb;border-radius:6px;padding:8px;background:#fef2f2;font-size:13px;">';
+                        if ($matches === null) return '';
+
+                        if (empty($matches)) {
+                            return new \Illuminate\Support\HtmlString(
+                                '<div style="padding:8px;border-radius:6px;background:#f0fdf4;border:1px solid #bbf7d0;font-size:13px;color:#15803d;">'
+                                . 'Nama ini aman. Tidak terdaftar di database PEP/DTTOT.</div>'
+                            );
+                        }
+
+                        $html = '<div style="max-height:200px;overflow-y:auto;border:1px solid #fecaca;border-radius:6px;padding:8px;background:#fef2f2;font-size:13px;">';
+                        $html .= '<div style="color:#dc2626;font-weight:600;margin-bottom:4px;">Ditemukan ' . count($matches) . ' kecocokan:</div>';
                         foreach ($matches as $m) {
                             $url = route('sanco.entity.show', $m['entity_id']);
                             $html .= '<div style="padding:4px 0;border-bottom:1px solid #fecaca;">';
@@ -91,7 +111,7 @@ class BuyTransactionForm
                         return new \Illuminate\Support\HtmlString($html);
                     })
                     ->columnSpan(2)
-                    ->visible(fn (callable $get) => !empty($get('_pep_matches'))),
+                    ->visible(fn (callable $get) => $get('_pep_matches') !== null),
                 TextInput::make('passport_number')
                     ->label('Passport Number')
                     ->columnSpan(2)
