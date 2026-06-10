@@ -4,24 +4,24 @@
     <meta charset="UTF-8">
     <title>Formulir Transaksi Tunai - {{ $transaction->transaction_code }}</title>
     <style>
-        body { font-family: 'Helvetica', 'Arial', sans-serif; font-size: 10px; margin: 0; padding: 0; }
+        body { font-family: 'Helvetica', 'Arial', sans-serif; font-size: 11px; margin: 0; padding: 0; }
         .header { width: 100%; margin-bottom: 4px; }
         .header td { border: none; vertical-align: middle; }
         .title-text { text-align: center; line-height: 1.1; }
-        .table-data { width: 100%; border-collapse: collapse; margin-bottom: 6px; font-size: 9px; }
+        .table-data { width: 100%; border-collapse: collapse; margin-bottom: 6px; font-size: 10px; }
         .table-data th, .table-data td {
             border: 1px solid #000;
             padding: 3px 4px;
             vertical-align: top;
             line-height: 1.2;
         }
-        .section-title { font-weight: bold; font-size: 9px; background-color: #f2f2f2; }
-        .check-box { display: inline-block; width: 8px; height: 8px; border: 1px solid #000; text-align: center; line-height: 8px; font-size: 8px; vertical-align: top; margin-top: 1px; }
+        .section-title { font-weight: bold; font-size: 10px; background-color: #f2f2f2; }
+        .check-box { display: inline-block; width: 9px; height: 9px; border: 1px solid #000; text-align: center; line-height: 9px; font-size: 9px; vertical-align: top; margin-top: 1px; }
         .nested-table { width: 100%; border-collapse: collapse; margin: 0; padding: 0; }
         .nested-table td { border: none; padding: 0 0 1px 0; }
         .checklist-table { width: 100%; border-collapse: collapse; border: none; margin-top: 2px; }
         .checklist-table td { border: none; padding: 0 0 2px 0; vertical-align: top; }
-        .checkbox-col { width: 12px; }
+        .checkbox-col { width: 14px; }
     </style>
 </head>
 <body>
@@ -32,9 +32,9 @@
                 <img src="{{ public_path('assets/images/logo_kop.png') }}" style="max-width: 90px; max-height: 50px;">
             </td>
             <td width="60%" style="text-align: center; vertical-align: top;">
-                <h2 style="margin: 0; font-size: 14px;">Authorized Money Changer</h2>
-                <div style="font-size: 10px; margin-bottom: 0;">(Pedagang Valuta Asing)</div>
-                <div style="font-size: 9px;">
+                <h2 style="margin: 0; font-size: 15px;">Authorized Money Changer</h2>
+                <div style="font-size: 11px; margin-bottom: 0;">(Pedagang Valuta Asing)</div>
+                <div style="font-size: 10px;">
                     {{ $office->address }}<br>
                     Phone / WA : {{ $office->phone }}<br>
                     E-mail : monicasejahtera24@gmail.com
@@ -43,9 +43,9 @@
             <td width="20%"></td>
         </tr>
     </table>
-    <div style="text-align: center; margin-top: 4px; font-size: 12px; font-weight: bold; text-decoration: underline; margin-bottom: 5px;">FORMULIR TRANSAKSI TUNAI</div>
+    <div style="text-align: center; margin-top: 4px; font-size: 13px; font-weight: bold; text-decoration: underline; margin-bottom: 5px;">FORMULIR TRANSAKSI TUNAI</div>
 
-    <table width="100%" style="margin-bottom: 2px; font-size: 9px;">
+    <table width="100%" style="margin-bottom: 2px; font-size: 10px;">
         <tr>
             <td width="50%">Cabang : {{ $cdd->cabang ?? '' }}</td>
             <td width="50%" style="text-align: right;">Tanggal : {{ $transaction->created_at->format('d-m-Y') }}</td>
@@ -284,7 +284,7 @@
         </tr>
     </table>
 
-    <div style="font-size: 9px; line-height: 1.2; margin-bottom: 4px;">
+    <div style="font-size: 10px; line-height: 1.2; margin-bottom: 4px;">
         Dengan menandatangani aplikasi ini, saya menyatakan bahwa seluruh data dalam formulir ini adalah merupakan data yang benar dan terkini dan transaksi bukan dalam rangka pencucian uang atau pendanaan terorisme.
     </div>
 
@@ -295,11 +295,11 @@
             </td>
             <td style="border: 1px solid #000; width: 50%; height: 65px; vertical-align: bottom; text-align: center; padding: 4px;">
                 <div style="margin-bottom: 12px;"><strong>{{ $cdd->no_telp ?? '_________________________' }}</strong></div>
-                <div style="font-size: 9px;">No Telp Pelaku Transaksi Yang dapat dihubungi</div>
+                <div style="font-size: 10px;">No Telp Pelaku Transaksi Yang dapat dihubungi</div>
             </td>
         </tr>
     </table>
-    <div style="font-weight: bold; font-size: 9px; margin-top: 2px;">
+    <div style="font-weight: bold; font-size: 10px; margin-top: 2px;">
         Data Wajib Diisi
     </div>
 
