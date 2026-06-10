@@ -81,10 +81,13 @@ class MutasiMataUang extends Page implements Forms\Contracts\HasForms
                 ->color('danger')
                 ->action(function () {
                     $this->loadData();
+                    $office = \App\Models\Office::first();
                     $pdf = \Barryvdh\DomPDF\Facade\Pdf::loadView('exports.mutasi-mata-uang', [
                         'groupedMutations' => $this->groupedMutations,
                         'startDate' => $this->startDate,
                         'endDate' => $this->endDate,
+                        'office' => $office,
+                        'isPdf' => true,
                     ]);
                     return response()->streamDownload(fn () => print($pdf->output()), 'mutasi-mata-uang-' . date('YmdHis') . '.pdf');
                 }),
