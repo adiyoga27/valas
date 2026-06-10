@@ -63,13 +63,25 @@ class ReportSellTransaction extends Page implements Tables\Contracts\HasTable, F
             ->schema([
                 Forms\Components\DatePicker::make('startDate')
                     ->label('Tanggal Awal')
-                    ->required(),
+                    ->required()
+                    ->live(),
 
                 Forms\Components\DatePicker::make('endDate')
                     ->label('Tanggal Akhir')
-                    ->required(),
+                    ->required()
+                    ->live(),
             ])
             ->columns(2);
+    }
+
+    public function updatedStartDate(): void
+    {
+        $this->resetTable();
+    }
+
+    public function updatedEndDate(): void
+    {
+        $this->resetTable();
     }
 
     protected function getTableQuery(): Builder
@@ -87,7 +99,6 @@ class ReportSellTransaction extends Page implements Tables\Contracts\HasTable, F
     public function table(Table $table): Table
     {
         return $table
-            ->query($this->getTableQuery())
             ->columns([
                 Tables\Columns\TextColumn::make('created_at')
                     ->label('Tanggal')
