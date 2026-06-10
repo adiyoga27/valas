@@ -9,46 +9,43 @@ class ImportSancoEntities extends Command
 {
     protected $signature = 'sanco:import-entities
                             {dataset? : Nama spesifik dataset (contoh: peps, sanctions)}
-                            {--compact : Import datasets ringkas PEP & sanctions utama saja}
-                            {--terror : Import datasets terkait terorisme saja}';
+                            {--all : Import semua dataset dari tabel sanco_datasets}
+                            {--tag=* : Filter dataset by tag (contoh: --tag=peps --tag=sanctions)}';
 
     protected $description = 'Import data entitas dari OpenSanctions ke database lokal';
 
-    protected array $compactDatasets = [
-        'peps',
-        'sanctions',
-        'us_ofac_sdn',
-        'un_sc_sanctions',
-        'eu_fsf',
-        'gb_fcdo_sanctions',
-    ];
-
-    protected array $terrorDatasets = [
-        'un_sc_sanctions',
-        'us_ofac_sdn',
-        'ca_listed_terrorists',
-        'gb_fcdo_sanctions',
-        'eu_fsf',
-    ];
-
     public function handle(): int
     {
-        $importer = new SancoImporter();
+        $importer = new \App\Services\SancoImporter();
 
         if ($this->argument('dataset')) {
             $names = [$this->argument('dataset')];
-        } elseif ($this->option('compact')) {
-            $names = $this->compactDatasets;
-            $this->info('Mengimport dataset PEP & sanctions utama...');
-        } elseif ($this->option('terror')) {
-            $names = $this->terrorDatasets;
-            $this->info('Mengimport dataset terorisme...');
         } else {
-            $this->error('Pilih salah satu: dataset spesifik, --compact, atau --terror');
-            $this->line('Contoh: php artisan sanco:import-entities peps');
-            $this->line('Contoh: php artisan sanco:import-entities --compact');
-            $this->line('Contoh: php artisan sanco:import-entities --terror');
-            return self::FAILURE;
+            $query = \App\Models\SancoDataset::query();
+
+            if ($this->option('all')) {
+                $this->info('Mengimport semua dataset...');
+            } elseif ($tags = $this->option('tag')) {
+                foreach ($tags as $tag) {
+                    $query->whereJsonContains('tags', $tag);
+                }
+                $this->info('Mengimport dataset dengan tag: ' . implode(', ', $tags) . '...');
+            } else {
+                $this->error('Pilih salah satu: dataset spesifik, --all, atau --tag');
+                $this->line('Contoh: php artisan sanco:import-entities peps');
+                $this->line('Contoh: php artisan sanco:import-entities --all');
+                $this->line('Contoh: php artisan sanco:import-entities --tag=peps --tag=sanctions');
+                return self::FAILURE;
+            }
+
+            $names = $query->pluck('name')->toArray();
+
+            if (empty($names)) {
+                $this->warn('Tidak ada dataset yang cocok di tabel sanco_datasets.');
+                return self::FAILURE;
+            }
+
+            $this->info('Ditemukan ' . count($names) . ' dataset.');
         }
 
         foreach ($names as $name) {

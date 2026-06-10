@@ -10,7 +10,8 @@ class EnrichSancoEntities extends Command
 {
     protected $signature = 'sanco:enrich
                             {dataset? : Dataset name to enrich (e.g. peps)}
-                            {--compact : Enrich PEP + sanctions datasets}';
+                            {--all : Enrich all datasets from sanco_datasets table}
+                            {--tag=* : Filter dataset by tag (contoh: --tag=peps --tag=sanctions)}';
 
     protected $description = 'Perkaya data entitas dengan alias/weakAlias dari entities.ftm.json';
 
@@ -18,11 +19,29 @@ class EnrichSancoEntities extends Command
     {
         if ($this->argument('dataset')) {
             $names = [$this->argument('dataset')];
-        } elseif ($this->option('compact')) {
-            $names = ['peps', 'sanctions', 'us_ofac_sdn', 'un_sc_sanctions', 'eu_fsf', 'gb_fcdo_sanctions'];
         } else {
-            $this->error('Gunakan: php artisan sanco:enrich peps  atau  --compact');
-            return self::FAILURE;
+            $query = \App\Models\SancoDataset::query();
+
+            if ($this->option('all')) {
+                $this->info('Enriching all datasets...');
+            } elseif ($tags = $this->option('tag')) {
+                foreach ($tags as $tag) {
+                    $query->whereJsonContains('tags', $tag);
+                }
+                $this->info('Enriching datasets with tags: ' . implode(', ', $tags) . '...');
+            } else {
+                $this->error('Gunakan: php artisan sanco:enrich peps  atau  --all  atau  --tag=peps');
+                return self::FAILURE;
+            }
+
+            $names = $query->pluck('name')->toArray();
+
+            if (empty($names)) {
+                $this->warn('Tidak ada dataset yang cocok di tabel sanco_datasets.');
+                return self::FAILURE;
+            }
+
+            $this->info('Ditemukan ' . count($names) . ' dataset.');
         }
 
         foreach ($names as $name) {

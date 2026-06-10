@@ -28,9 +28,16 @@ class ListSancoDatasets extends ListRecords
                 ->color('success')
                 ->action(function () {
                     $importer = new SancoImporter();
-                    $datasets = ['sanctions', 'us_ofac_sdn', 'un_sc_sanctions', 'eu_fsf', 'gb_fcdo_sanctions'];
+                    $datasets = \App\Models\SancoDataset::whereJsonContains('tags', 'sanctions')
+                        ->pluck('name')
+                        ->toArray();
 
-                    $this->notify('info', 'Memulai import data entitas...');
+                    if (empty($datasets)) {
+                        $this->notify('warning', 'Tidak ada dataset dengan tag sanctions.');
+                        return;
+                    }
+
+                    $this->notify('info', 'Memulai import ' . count($datasets) . ' dataset...');
 
                     foreach ($datasets as $name) {
                         $result = $importer->importDataset($name);
