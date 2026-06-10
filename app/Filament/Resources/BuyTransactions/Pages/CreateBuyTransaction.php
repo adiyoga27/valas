@@ -4,7 +4,10 @@ namespace App\Filament\Resources\BuyTransactions\Pages;
 
 use App\Filament\Resources\BuyTransactions\BuyTransactionResource;
 use App\Models\BuyTransaction;
+use App\Models\BuyTransactionCdd;
 use App\Models\BuyTransactionItem;
+use App\Models\Office;
+use Filament\Notifications\Notification;
 use Filament\Resources\Pages\CreateRecord;
 use Illuminate\Support\Facades\DB;
 
@@ -29,7 +32,8 @@ class CreateBuyTransaction extends CreateRecord
             $items = $data['items'] ?? [];
             $itemsTotal = 0;
             $additionalAmounts = $data['additional_amounts'] ?? [];
-            unset($data['items'], $data['additional_amounts']);
+            $cddData = $data['cdd'] ?? [];
+            unset($data['items'], $data['additional_amounts'], $data['cdd']);
             $transaction = BuyTransaction::create([
                 'transaction_code' => $data['transaction_code'] ?? 'BUY-' . time(),
                 'user_id' => $data['user_id'] ?? auth()->id(),
@@ -66,6 +70,28 @@ class CreateBuyTransaction extends CreateRecord
             $transaction->additional_amounts = $additionalAmounts;
             $transaction->grand_total = $grandTotal;
             $transaction->save();
+
+            $threshold = (float) (Office::first()?->cdd_threshold ?? 0);
+            if ($threshold > 0 && $grandTotal >= $threshold && !empty(array_filter($cddData))) {
+                BuyTransactionCdd::create([
+                    'buy_transaction_id' => $transaction->id,
+                    'jenis_nasabah' => $cddData['jenis_nasabah'] ?? null,
+                    'nama_lengkap' => $cddData['nama_lengkap'] ?? null,
+                    'npwp' => $cddData['npwp'] ?? null,
+                    'nama_jalan' => $cddData['nama_jalan'] ?? null,
+                    'rt_rw' => $cddData['rt_rw'] ?? null,
+                    'kecamatan' => $cddData['kecamatan'] ?? null,
+                    'kabupaten' => $cddData['kabupaten'] ?? null,
+                    'provinsi' => $cddData['provinsi'] ?? null,
+                    'cabang' => $cddData['cabang'] ?? null,
+                    'tujuan_transaksi' => $cddData['tujuan_transaksi'] ?? null,
+                    'hubungan_pemilik_dana' => $cddData['hubungan_pemilik_dana'] ?? null,
+                    'sumber_dana' => $cddData['sumber_dana'] ?? null,
+                    'total_dana_tunai' => $cddData['total_dana_tunai'] ?? null,
+                    'no_telp' => $cddData['no_telp'] ?? null,
+                ]);
+            }
+
             return $transaction;
         });
     }

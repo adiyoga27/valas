@@ -10,7 +10,8 @@ class Office extends Model
         'name',
         'address',
         'phone',
-        'logo'
+        'logo',
+        'cdd_threshold',
     ];
 
     use \Spatie\Activitylog\Traits\LogsActivity;

@@ -28,6 +28,14 @@ class ViewBuyTransaction extends ViewRecord
             ->icon('heroicon-o-printer')
             ->url(fn (): string => route('filament.admin.resources.buy-transactions.print', ['record' => $this->record->id]))
             ->openUrlInNewTab(),
+
+        Action::make('downloadCdd')
+            ->label('Download CDD')
+            ->icon('heroicon-o-document-check')
+            ->color('warning')
+            ->url(fn (): string => route('filament.admin.resources.buy-transactions.cdd', ['record' => $this->record->id]))
+            ->openUrlInNewTab()
+            ->visible(fn () => $this->record->cdd()->exists()),
             
             // Opsional: Tombol Edit jika diperlukan
             EditAction::make(),

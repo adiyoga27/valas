@@ -63,6 +63,12 @@ class OfficeSetting extends Page implements HasForms
     // ->preserveFilenames(false)
     ->maxSize(2048),
 
+    TextInput::make('cdd_threshold')
+        ->label('Batas Nominal CDD (Rp)')
+        ->numeric()
+        ->nullable()
+        ->placeholder('Contoh: 500000000')
+        ->helperText('Transaksi pembelian di atas nominal ini wajib mengisi formulir CDD. Kosongkan untuk menonaktifkan.'),
         ];
     }
 

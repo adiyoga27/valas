@@ -28,6 +28,11 @@ class OfficeForm
                     ->image()
                     ->directory('office-logo')
                     ->maxSize(2048),
+
+                TextInput::make('cdd_threshold')
+                    ->label('Batas CDD (Rp)')
+                    ->numeric()
+                    ->nullable(),
             ]);
     }
 }

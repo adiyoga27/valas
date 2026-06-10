@@ -7,6 +7,7 @@ use Filament\Actions\DeleteBulkAction;
 use Filament\Actions\EditAction;
 use Filament\Actions\ViewAction;
 use Filament\Schemas\Components\View;
+use Filament\Actions\Action;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Filters\Filter;
 use Filament\Forms\Components\DatePicker;
@@ -46,7 +47,14 @@ class BuyTransactionsTable
             ])
             ->recordActions([
                 EditAction::make(),
-                ViewAction::make()
+                ViewAction::make(),
+                Action::make('download_cdd')
+                    ->label('CDD')
+                    ->icon('heroicon-o-document-check')
+                    ->color('warning')
+                    ->url(fn ($record) => route('filament.admin.resources.buy-transactions.cdd', $record))
+                    ->openUrlInNewTab()
+                    ->visible(fn ($record) => $record->cdd()->exists()),
             ])
             ->toolbarActions([
                 BulkActionGroup::make([

@@ -3,6 +3,7 @@
 namespace App\Filament\Resources\BuyTransactions\Schemas;
 
 use App\Models\Currency;
+use Filament\Schemas\Components\Fieldset;
 use Filament\Forms\Components\Hidden;
 use Filament\Forms\Components\Placeholder;
 use Filament\Forms\Components\Repeater;
@@ -15,6 +16,19 @@ use Filament\Schemas\Schema;
 
 class BuyTransactionForm
 {
+    protected static function cddThreshold(): float
+    {
+        return (float) (\App\Models\Office::first()?->cdd_threshold ?? 0);
+    }
+
+    protected static function showCdd(callable $get): bool
+    {
+        $threshold = self::cddThreshold();
+        if ($threshold <= 0) return false;
+        if (($get('grand_total') ?? 0) >= $threshold) return true;
+        return !empty($get('cdd.jenis_nasabah'));
+    }
+
     public static function configure(Schema $schema): Schema
     {
         return $schema
@@ -199,6 +213,96 @@ class BuyTransactionForm
                         'class' => 'text-right text-3xl font-bold text-success',
                     ])
                     ->columnSpan(2),
+
+                Fieldset::make('Formulir Transaksi Tunai (CDD)')
+                    ->schema([
+                        Placeholder::make('cdd_info')
+                            ->content(fn () => 'Transaksi ini melebihi batas Rp ' . number_format(self::cddThreshold(), 0, ',', '.') . '. Harap isi formulir CDD di bawah ini.')
+                            ->columnSpan(2),
+
+                        Select::make('cdd.jenis_nasabah')
+                            ->label('Jenis Nasabah')
+                            ->options([
+                                'Perorangan WNI' => 'Perorangan WNI',
+                                'Perorangan WNA' => 'Perorangan WNA',
+                                'Korporasi-Resident' => 'Korporasi-Resident',
+                                'Korporasi-Non Resident' => 'Korporasi-Non Resident',
+                            ])
+                            ->required(fn ($get) => self::showCdd($get))
+                            ->columnSpan(2),
+
+                        TextInput::make('cdd.nama_lengkap')
+                            ->label('Nama Lengkap')
+                            ->required(fn ($get) => self::showCdd($get))
+                            ->columnSpan(2),
+
+                        TextInput::make('cdd.npwp')
+                            ->label('NPWP')
+                            ->columnSpan(1),
+
+                        TextInput::make('cdd.cabang')
+                            ->label('Cabang')
+                            ->columnSpan(1),
+
+                        TextInput::make('cdd.nama_jalan')
+                            ->label('Alamat (Nama Jalan)')
+                            ->columnSpan(2),
+
+                        TextInput::make('cdd.rt_rw')
+                            ->label('RT/RW')
+                            ->columnSpan(1),
+
+                        TextInput::make('cdd.kecamatan')
+                            ->label('Kecamatan')
+                            ->columnSpan(1),
+
+                        TextInput::make('cdd.kabupaten')
+                            ->label('Kabupaten')
+                            ->columnSpan(1),
+
+                        TextInput::make('cdd.provinsi')
+                            ->label('Provinsi')
+                            ->columnSpan(1),
+
+                        Select::make('cdd.tujuan_transaksi')
+                            ->label('Tujuan Transaksi')
+                            ->options([
+                                'Tabungan' => 'Tabungan / Investasi',
+                                'Pajak' => 'Pembayaran Pajak',
+                                'Bisnis' => 'Bisnis',
+                            ])
+                            ->required(fn ($get) => self::showCdd($get))
+                            ->columnSpan(1),
+
+                        Select::make('cdd.hubungan_pemilik_dana')
+                            ->label('Hubungan Pemilik Dana')
+                            ->options([
+                                'Sendiri' => 'Rekening Sendiri',
+                                'Keluarga' => 'Keluarga Dekat',
+                            ])
+                            ->required(fn ($get) => self::showCdd($get))
+                            ->columnSpan(1),
+
+                        Select::make('cdd.sumber_dana')
+                            ->label('Sumber Dana')
+                            ->options([
+                                'Gaji' => 'Gaji / Penghasilan',
+                                'Usaha' => 'Hasil Usaha',
+                            ])
+                            ->required(fn ($get) => self::showCdd($get))
+                            ->columnSpan(1),
+
+                        TextInput::make('cdd.total_dana_tunai')
+                            ->label('Total Jumlah Dana Tunai')
+                            ->columnSpan(1),
+
+                        TextInput::make('cdd.no_telp')
+                            ->label('No. Telp Pelaku')
+                            ->columnSpan(1),
+                    ])
+                    ->columns(2)
+                    ->columnSpan('full')
+                    ->visible(fn ($get) => self::showCdd($get)),
 
             ]);
     }
