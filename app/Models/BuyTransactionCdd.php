@@ -22,6 +22,16 @@ class BuyTransactionCdd extends Model
         'sumber_dana',
         'total_dana_tunai',
         'no_telp',
+        'penghasilan_tahun',
+        'negara',
+        'kode_pos',
+        'jenis_pekerjaan',
+        'jenis_pekerjaan_lainnya',
+        'nama_perusahaan',
+        'jabatan',
+        'bentuk_hukum',
+        'bentuk_hukum_lainnya',
+        'bidang_usaha',
     ];
 
     public function buyTransaction()
