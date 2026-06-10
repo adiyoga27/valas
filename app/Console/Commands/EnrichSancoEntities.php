@@ -45,7 +45,12 @@ class EnrichSancoEntities extends Command
         }
 
         foreach ($names as $name) {
-            $this->enrichDataset($name);
+            try {
+                $this->enrichDataset($name);
+            } catch (\Exception $e) {
+                $this->error("  Gagal enrich {$name}: " . $e->getMessage());
+                DB::statement('DROP TEMPORARY TABLE IF EXISTS sanco_enrich_lookup');
+            }
         }
 
         return self::SUCCESS;
@@ -80,6 +85,7 @@ class EnrichSancoEntities extends Command
 
         $this->info("  {$count} entities exist. Building lookup index...");
 
+        DB::statement('DROP TEMPORARY TABLE IF EXISTS sanco_enrich_lookup');
         DB::statement('CREATE TEMPORARY TABLE sanco_enrich_lookup (entity_id VARCHAR(255) PRIMARY KEY) ENGINE=InnoDB');
         DB::statement("INSERT INTO sanco_enrich_lookup (entity_id) SELECT entity_id FROM sanco_entities WHERE dataset_name = ?", [$datasetName]);
 
@@ -96,7 +102,7 @@ class EnrichSancoEntities extends Command
         $ch = curl_init($ftm['url']);
         curl_setopt_array($ch, [
             CURLOPT_TIMEOUT => 3600,
-            CURLOPT_CONNECTTIMEOUT => 30,
+            CURLOPT_CONNECTTIMEOUT => 60,
             CURLOPT_LOW_SPEED_LIMIT => 1024,
             CURLOPT_LOW_SPEED_TIME => 30,
             CURLOPT_FILE => $fh,
