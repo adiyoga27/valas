@@ -12,6 +12,8 @@ use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\DateTimePicker;
 use Filament\Schemas\Components\Grid;
+use Filament\Schemas\Components\Utilities\Get;
+use Filament\Schemas\Components\Utilities\Set;
 use Filament\Schemas\Schema;
 
 class BuyTransactionForm
@@ -55,35 +57,59 @@ class BuyTransactionForm
                     ->label('Customer Name')
                     ->columnSpan(2)
                     ->required()->label("Nama Pelanggan")
-                    ->live(debounce: 500)
-                    ->afterStateUpdated(function ($state, callable $set) {
-                        if (empty(trim($state ?? '')) || strlen(trim($state)) < 2) {
-                            $set('_pep_matches', null);
-                            return;
-                        }
+                    ->live(onBlur: true),
 
-                        $entities = SancoEntity::where('name', 'like', '%' . trim($state) . '%')
-                            ->select('name', 'entity_id', 'dataset_title', 'dataset_name')
-                            ->orderBy('entity_id')
-                            ->limit(50)
-                            ->get();
+                \Filament\Schemas\Components\Actions::make([
+                    \Filament\Actions\Action::make('check_pep')
+                        ->label('Check PEP/DTTOT')
+                        ->icon('heroicon-m-magnifying-glass')
+                        ->action(function (Get $get, Set $set) {
+                            $state = $get('customer_name');
+                            
+                            if (empty(trim($state ?? '')) || strlen(trim($state)) < 2) {
+                                $set('_pep_matches', null);
+                                return;
+                            }
 
-                        $result = [];
-                        $seen = [];
+                            $searchTerm = '%' . trim($state) . '%';
+                            $entities = \App\Models\SancoEntity::where(function ($query) use ($searchTerm) {
+                                    $query->where('name', 'like', $searchTerm)
+                                          ->orWhere('aliases', 'like', $searchTerm)
+                                          ->orWhere('weak_aliases', 'like', $searchTerm);
+                                })
+                                ->select('name', 'entity_id', 'dataset_title', 'dataset_name')
+                                ->orderBy('entity_id')
+                                ->limit(100)
+                                ->get();
 
-                        foreach ($entities as $e) {
-                            if (isset($seen[$e->entity_id])) continue;
-                            $seen[$e->entity_id] = true;
+                            $result = [];
+                            $groupedEntities = [];
 
-                            $result[] = [
-                                'name' => $e->name,
-                                'dataset' => $e->dataset_title ?? $e->dataset_name ?? '-',
-                                'entity_id' => $e->entity_id,
-                            ];
-                        }
+                            foreach ($entities as $e) {
+                                $dataset = $e->dataset_title ?? $e->dataset_name ?? '-';
+                                if (!isset($groupedEntities[$e->entity_id])) {
+                                    $groupedEntities[$e->entity_id] = [
+                                        'name' => $e->name,
+                                        'entity_id' => $e->entity_id,
+                                        'datasets' => []
+                                    ];
+                                }
+                                if (!in_array($dataset, $groupedEntities[$e->entity_id]['datasets'])) {
+                                    $groupedEntities[$e->entity_id]['datasets'][] = $dataset;
+                                }
+                            }
 
-                        $set('_pep_matches', array_slice($result, 0, 10));
-                    }),
+                            foreach ($groupedEntities as $group) {
+                                $result[] = [
+                                    'name' => $group['name'],
+                                    'dataset' => implode(', ', $group['datasets']),
+                                    'entity_id' => $group['entity_id'],
+                                ];
+                            }
+
+                            $set('_pep_matches', array_slice($result, 0, 10));
+                        })
+                ])->columnSpan(2),
                 Placeholder::make('_pep_display')
                     ->label('PEP/DTTOT Check')
                     ->content(function (callable $get) {
