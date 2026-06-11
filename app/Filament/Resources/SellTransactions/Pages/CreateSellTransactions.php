@@ -165,7 +165,7 @@ class CreateSellTransactions extends CreateRecord
                     ->columnSpan(1),
 
                 TextInput::make('cabang')
-                    ->label('Cabang')
+                    ->label('Kantor Pusat')
                     ->default(fn () => Office::first()?->name)
                     ->columnSpan(1),
 

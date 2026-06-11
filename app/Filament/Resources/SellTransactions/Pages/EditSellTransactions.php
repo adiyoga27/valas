@@ -12,6 +12,7 @@ use Filament\Forms\Components\TextInput;
 use Filament\Resources\Pages\EditRecord;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\DB;
+use Filament\Notifications\Notification;
 
 class EditSellTransactions extends EditRecord
 {
@@ -105,7 +106,7 @@ class EditSellTransactions extends EditRecord
                 ->form($this->cddFormSchema())
                 ->action(function (array $data): void {
                     $this->record->cdd->update($data);
-                    $this->notify('success', 'Data CDD berhasil diperbarui.');
+                    Notification::make()->success()->title('Data CDD berhasil diperbarui.')->send();
                 });
         }
 
@@ -126,7 +127,7 @@ class EditSellTransactions extends EditRecord
                 ->required(),
             TextInput::make('nama_lengkap')->label('Nama Lengkap')->required(),
             TextInput::make('npwp')->label('NPWP'),
-            TextInput::make('cabang')->label('Cabang'),
+            TextInput::make('cabang')->label('Kantor Pusat'),
             TextInput::make('nama_jalan')->label('Alamat (Nama Jalan)'),
             TextInput::make('rt_rw')->label('RT/RW'),
             TextInput::make('kecamatan')->label('Kecamatan'),
