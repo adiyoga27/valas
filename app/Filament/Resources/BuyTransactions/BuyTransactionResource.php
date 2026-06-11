@@ -56,7 +56,7 @@ class BuyTransactionResource extends Resource
     public static function getEloquentQuery(): Builder
     {
         return parent::getEloquentQuery()
-            ->with('items', 'cdd');
+            ->with('items');
     }
     public static function getPages(): array
     {

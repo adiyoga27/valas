@@ -3,6 +3,7 @@
 namespace App\Filament\Resources\SellTransactions\Schemas;
 
 use App\Models\Currency;
+use App\Models\SancoEntity;
 use Filament\Forms\Components\Hidden;
 use Filament\Forms\Components\Placeholder;
 use Filament\Forms\Components\Repeater;
@@ -11,6 +12,8 @@ use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\DateTimePicker;
 use Filament\Schemas\Components\Grid;
+use Filament\Schemas\Components\Utilities\Get;
+use Filament\Schemas\Components\Utilities\Set;
 use Filament\Schemas\Schema;
 
 class SellTransactionsForm
@@ -47,10 +50,91 @@ class SellTransactionsForm
                     ->dehydrated()
                     ->label("No. Invoice"),
 
-   TextInput::make('customer_name')
+                TextInput::make('customer_name')
                     ->label('Customer Name')
                     ->columnSpan(2)
-                    ->required()->label("Nama Pelanggan"),
+                    ->required()->label("Nama Pelanggan")
+                    ->live(onBlur: true),
+
+                \Filament\Schemas\Components\Actions::make([
+                    \Filament\Actions\Action::make('check_pep')
+                        ->label('Check PEP/DTTOT')
+                        ->icon('heroicon-m-magnifying-glass')
+                        ->action(function (Get $get, Set $set) {
+                            $state = $get('customer_name');
+                            
+                            if (empty(trim($state ?? '')) || strlen(trim($state)) < 2) {
+                                $set('_pep_matches', null);
+                                return;
+                            }
+
+                            $searchTerm = '%' . trim($state) . '%';
+                            $entities = \App\Models\SancoEntity::where(function ($query) use ($searchTerm) {
+                                    $query->where('name', 'like', $searchTerm)
+                                          ->orWhere('aliases', 'like', $searchTerm)
+                                          ->orWhere('weak_aliases', 'like', $searchTerm);
+                                })
+                                ->select('name', 'entity_id', 'dataset_title', 'dataset_name')
+                                ->orderBy('entity_id')
+                                ->limit(100)
+                                ->get();
+
+                            $result = [];
+                            $groupedEntities = [];
+
+                            foreach ($entities as $e) {
+                                $dataset = $e->dataset_title ?? $e->dataset_name ?? '-';
+                                if (!isset($groupedEntities[$e->entity_id])) {
+                                    $groupedEntities[$e->entity_id] = [
+                                        'name' => $e->name,
+                                        'entity_id' => $e->entity_id,
+                                        'datasets' => []
+                                    ];
+                                }
+                                if (!in_array($dataset, $groupedEntities[$e->entity_id]['datasets'])) {
+                                    $groupedEntities[$e->entity_id]['datasets'][] = $dataset;
+                                }
+                            }
+
+                            foreach ($groupedEntities as $group) {
+                                $result[] = [
+                                    'name' => $group['name'],
+                                    'dataset' => implode(', ', $group['datasets']),
+                                    'entity_id' => $group['entity_id'],
+                                ];
+                            }
+
+                            $set('_pep_matches', array_slice($result, 0, 10));
+                        })
+                ])->columnSpan(2),
+                Placeholder::make('_pep_display')
+                    ->label('PEP/DTTOT Check')
+                    ->content(function (callable $get) {
+                        $matches = $get('_pep_matches');
+
+                        if ($matches === null) return '';
+
+                        if (empty($matches)) {
+                            return new \Illuminate\Support\HtmlString(
+                                '<div style="padding:8px;border-radius:6px;background:#f0fdf4;border:1px solid #bbf7d0;font-size:13px;color:#15803d;">'
+                                . 'Nama ini aman. Tidak terdaftar di database PEP/DTTOT.</div>'
+                            );
+                        }
+
+                        $html = '<div style="max-height:200px;overflow-y:auto;border:1px solid #fecaca;border-radius:6px;padding:8px;background:#fef2f2;font-size:13px;">';
+                        $html .= '<div style="color:#dc2626;font-weight:600;margin-bottom:4px;">Ditemukan ' . count($matches) . ' kecocokan:</div>';
+                        foreach ($matches as $m) {
+                            $url = route('sanco.entity.show', $m['entity_id']);
+                            $html .= '<div style="padding:4px 0;border-bottom:1px solid #fecaca;">';
+                            $html .= '<a href="' . $url . '" target="_blank" style="font-weight:600;color:#dc2626;text-decoration:none;">' . e($m['name']) . '</a>';
+                            $html .= ' <span style="color:#6b7280;font-size:11px;">(' . e($m['dataset']) . ')</span>';
+                            $html .= '</div>';
+                        }
+                        $html .= '</div>';
+                        return new \Illuminate\Support\HtmlString($html);
+                    })
+                    ->columnSpan(2)
+                    ->visible(fn (callable $get) => $get('_pep_matches') !== null),
                 TextInput::make('passport_number')
                     ->label('Passport Number')
                     ->columnSpan(2)
@@ -74,6 +158,11 @@ class SellTransactionsForm
 
                 Hidden::make('user_id')
                     ->default(fn() => auth()->id()),
+                Hidden::make('total_amount')
+                    ->default(0),
+                Hidden::make('grand_total')
+                    ->default(0)
+                    ->live(),
 
                 Repeater::make('items')
                     ->dehydrated()

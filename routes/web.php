@@ -21,3 +21,6 @@ Route::get('/filament/admin/sell-transactions/{record}/print', [SellTransactionP
 
 Route::get('/filament/admin/buy-transactions/{record}/cdd', [CddPrintController::class, 'print'])
     ->name('filament.admin.resources.buy-transactions.cdd');
+
+Route::get('/filament/admin/sell-transactions/{record}/cdd', [CddPrintController::class, 'printSell'])
+    ->name('filament.admin.resources.sell-transactions.cdd');

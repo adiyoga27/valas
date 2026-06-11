@@ -60,4 +60,9 @@ class SellTransaction extends Model
     {
         return $this->belongsTo(User::class);
     }
+
+    public function cdd()
+    {
+        return $this->hasOne(SellTransactionCdd::class);
+    }
 }

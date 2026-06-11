@@ -4,7 +4,11 @@ namespace App\Filament\Resources\SellTransactions\Pages;
 
 use App\Filament\Resources\SellTransactions\SellTransactionsResource;
 use App\Models\SellTransactionItem;
+use App\Models\Office;
+use Filament\Actions\Action;
 use Filament\Actions\DeleteAction;
+use Filament\Forms\Components\Select;
+use Filament\Forms\Components\TextInput;
 use Filament\Resources\Pages\EditRecord;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\DB;
@@ -41,7 +45,6 @@ class EditSellTransactions extends EditRecord
 
             unset($data['items'], $data['additional_amounts']);
 
-            // Update header
             $record->update([
                 'transaction_code' => $data['transaction_code'],
                 'created_at' => $data['created_at'],
@@ -56,7 +59,6 @@ class EditSellTransactions extends EditRecord
                 'additional_amounts' => $additionalAmounts,
             ]);
 
-            // Reset items lama
             $record->items()->delete();
 
             $total = 0;
@@ -88,8 +90,90 @@ class EditSellTransactions extends EditRecord
 
     protected function getHeaderActions(): array
     {
-        return [
+        $actions = [
             DeleteAction::make(),
+        ];
+
+        if ($this->record->cdd()->exists()) {
+            $actions[] = Action::make('editCdd')
+                ->label('Edit CDD')
+                ->icon('heroicon-o-document-check')
+                ->color('warning')
+                ->modalHeading('Edit Formulir Transaksi Tunai (CDD)')
+                ->modalWidth('3xl')
+                ->fillForm(fn () => $this->record->cdd->toArray())
+                ->form($this->cddFormSchema())
+                ->action(function (array $data): void {
+                    $this->record->cdd->update($data);
+                    $this->notify('success', 'Data CDD berhasil diperbarui.');
+                });
+        }
+
+        return $actions;
+    }
+
+    protected function cddFormSchema(): array
+    {
+        return [
+            Select::make('jenis_nasabah')
+                ->label('Jenis Nasabah')
+                ->options([
+                    'Perorangan WNI' => 'Perorangan WNI',
+                    'Perorangan WNA' => 'Perorangan WNA',
+                    'Korporasi-Resident' => 'Korporasi-Resident',
+                    'Korporasi-Non Resident' => 'Korporasi-Non Resident',
+                ])
+                ->required(),
+            TextInput::make('nama_lengkap')->label('Nama Lengkap')->required(),
+            TextInput::make('npwp')->label('NPWP'),
+            TextInput::make('cabang')->label('Cabang'),
+            TextInput::make('nama_jalan')->label('Alamat (Nama Jalan)'),
+            TextInput::make('rt_rw')->label('RT/RW'),
+            TextInput::make('kecamatan')->label('Kecamatan'),
+            TextInput::make('kabupaten')->label('Kabupaten'),
+            TextInput::make('provinsi')->label('Provinsi'),
+            TextInput::make('negara')->label('Negara'),
+            TextInput::make('kode_pos')->label('Kode Pos'),
+            Select::make('tujuan_transaksi')->label('Tujuan Transaksi')->options([
+                'Tabungan' => 'Tabungan / Investasi',
+                'Pajak' => 'Pembayaran Pajak',
+                'Bisnis' => 'Bisnis',
+            ])->required(),
+            Select::make('hubungan_pemilik_dana')->label('Hubungan Pemilik Dana')->options([
+                'Sendiri' => 'Rekening Sendiri',
+                'Keluarga' => 'Keluarga Dekat',
+            ])->required(),
+            Select::make('sumber_dana')->label('Sumber Dana')->options([
+                'Gaji' => 'Gaji / Penghasilan',
+                'Usaha' => 'Hasil Usaha',
+            ])->required(),
+            TextInput::make('total_dana_tunai')->label('Total Jumlah Dana Tunai'),
+            TextInput::make('no_telp')->label('No. Telp Pelaku'),
+            TextInput::make('penghasilan_tahun')->label('Rata-rata Penghasilan/Tahun (Juta Rp)')->numeric(),
+            Select::make('jenis_pekerjaan')->label('Jenis Pekerjaan')->options([
+                'Pegawai Negeri' => 'Pegawai Negeri',
+                'ABRI' => 'ABRI',
+                'Pegawai Swasta' => 'Pegawai Swasta (termasuk pensiunan)',
+                'Wiraswasta' => 'Wiraswasta',
+                'Ibu Rumah Tangga' => 'Ibu Rumah Tangga',
+                'Pelajar' => 'Pelajar',
+                'Pedagang' => 'Pedagang',
+                'Lainnya' => 'Lainnya',
+            ])->reactive(),
+            TextInput::make('jenis_pekerjaan_lainnya')->label('Sebutkan Jenis Pekerjaan')
+                ->visible(fn ($get) => $get('jenis_pekerjaan') === 'Lainnya'),
+            TextInput::make('nama_perusahaan')->label('Nama Perusahaan Tempat Bekerja'),
+            TextInput::make('jabatan')->label('Jabatan'),
+            Select::make('bentuk_hukum')->label('Bentuk Hukum Tempat Bekerja')->options([
+                'CV' => 'CV',
+                'PT' => 'PT',
+                'Yayasan' => 'Yayasan',
+                'Firma' => 'Firma',
+                'Lainnya' => 'Lainnya',
+            ])->reactive(),
+            TextInput::make('bentuk_hukum_lainnya')->label('Sebutkan Bentuk Hukum')
+                ->visible(fn ($get) => $get('bentuk_hukum') === 'Lainnya'),
+            TextInput::make('bidang_usaha')->label('Bidang Usaha Korporasi'),
         ];
     }
 }

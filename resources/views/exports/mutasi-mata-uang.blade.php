@@ -27,7 +27,7 @@
         <table class="kop-table">
             <tr>
                 <td width="20%" style="text-align: left;">
-                    <img src="{{ public_path('assets/images/logo_kop.png') }}" style="max-width: 90px; max-height: 50px;">
+                    <img src="{{ public_path('assets/images/logo_kop.png') }}" style="max-width: 200px; max-height: 100px; display: block; margin-top: -5px;">
                 </td>
                 <td width="60%" style="text-align: center;">
                     <div class="kop-title">Authorized Money Changer</div>

@@ -14,14 +14,20 @@ class ViewSellTransactions extends ViewRecord
      protected function getHeaderActions(): array
     {
         return [
-            // Tambahkan tombol untuk mencetak invoice
         Action::make('printInvoice')
             ->label('Cetak Invoice')
             ->icon('heroicon-o-printer')
             ->url(fn (): string => route('filament.admin.resources.sell-transactions.print', ['record' => $this->record->id]))
             ->openUrlInNewTab(),
+
+        Action::make('downloadCdd')
+            ->label('Download CDD')
+            ->icon('heroicon-o-document-check')
+            ->color('warning')
+            ->url(fn (): string => route('filament.admin.resources.sell-transactions.cdd', ['record' => $this->record->id]))
+            ->openUrlInNewTab()
+            ->visible(fn () => $this->record->cdd()->exists()),
             
-            // Opsional: Tombol Edit jika diperlukan
             EditAction::make(),
         ];
     }
