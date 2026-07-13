@@ -2,13 +2,12 @@
 
 namespace App\Exports;
 
-use App\Models\BuyTransaction;
+use App\Models\BuyTransactionItem;
 use Carbon\Carbon;
-use Maatwebsite\Excel\Concerns\FromCollection;
-use Maatwebsite\Excel\Concerns\WithHeadings;
-use Maatwebsite\Excel\Concerns\WithMapping;
+use Illuminate\Contracts\View\View;
+use Maatwebsite\Excel\Concerns\FromView;
 
-class ReportBuyTransactionExport implements FromCollection, WithHeadings, WithMapping
+class ReportBuyTransactionExport implements FromView
 {
     protected $startDate;
     protected $endDate;
@@ -19,33 +18,22 @@ class ReportBuyTransactionExport implements FromCollection, WithHeadings, WithMa
         $this->endDate   = $endDate;
     }
 
-    public function collection()
+    public function view(): View
     {
-        return BuyTransaction::whereBetween('created_at', [
+        $items = BuyTransactionItem::query()
+            ->select('buy_transaction_items.*')
+            ->join('buy_transactions', 'buy_transaction_items.buy_transaction_id', '=', 'buy_transactions.id')
+            ->whereBetween('buy_transactions.created_at', [
                 Carbon::parse($this->startDate)->startOfDay(),
                 Carbon::parse($this->endDate)->endOfDay(),
             ])
-            ->orderBy('created_at')
+            ->orderBy('buy_transactions.created_at')
             ->get();
-    }
 
-    public function headings(): array
-    {
-        return [
-            'Tanggal',
-            'Kode Transaksi',
-            'Customer',
-            'Total (IDR)',
-        ];
-    }
-
-    public function map($row): array
-    {
-        return [
-            $row->created_at->format('d-m-Y H:i'),
-            $row->transaction_code,
-            $row->customer_name,
-            $row->grand_total,
-        ];
+        return view('exports.report-buy-transaction', [
+            'items' => $items,
+            'startDate' => $this->startDate,
+            'endDate' => $this->endDate,
+        ]);
     }
 }

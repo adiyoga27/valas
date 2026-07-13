@@ -2,7 +2,7 @@
 
 namespace App\Filament\Pages;
 
-use App\Models\BuyTransaction;
+use App\Models\BuyTransactionItem;
 use Carbon\Carbon;
 use Filament\Forms;
 use Filament\Pages\Page;
@@ -36,24 +36,25 @@ class ReportBuyTransaction extends Page implements Tables\Contracts\HasTable, Fo
         $this->startDate = now()->startOfMonth()->toDateString();
         $this->endDate   = now()->toDateString();
     }
-protected function getHeaderActions(): array
-{
-    return [
-        Action::make('export')
-            ->label('Export Excel')
-            ->icon('heroicon-o-arrow-down-tray')
-            ->color('success')
-            ->action(fn () =>
-                Excel::download(
-                    new ReportBuyTransactionExport(
-                        $this->startDate,
-                        $this->endDate
-                    ),
-                    'report-pembelian-valas.xlsx'
-                )
-            ),
-    ];
-}
+
+    protected function getHeaderActions(): array
+    {
+        return [
+            Action::make('export')
+                ->label('Export Excel')
+                ->icon('heroicon-o-arrow-down-tray')
+                ->color('success')
+                ->action(fn () =>
+                    Excel::download(
+                        new ReportBuyTransactionExport(
+                            $this->startDate,
+                            $this->endDate
+                        ),
+                        'report-pembelian-valas.xlsx'
+                    )
+                ),
+        ];
+    }
 
     public function form(Schema $form): Schema
     {
@@ -84,34 +85,56 @@ protected function getHeaderActions(): array
 
     protected function getTableQuery(): Builder
     {
-        return BuyTransaction::query()
+        return BuyTransactionItem::query()
+            ->select('buy_transaction_items.*')
+            ->join('buy_transactions', 'buy_transaction_items.buy_transaction_id', '=', 'buy_transactions.id')
             ->when($this->startDate && $this->endDate, function ($query) {
-                $query->whereBetween('created_at', [
+                $query->whereBetween('buy_transactions.created_at', [
                     Carbon::parse($this->startDate)->startOfDay(),
                     Carbon::parse($this->endDate)->endOfDay(),
                 ]);
             })
-            ->latest('created_at');
+            ;
     }
 
     public function table(Table $table): Table
     {
         return $table
             ->columns([
-                Tables\Columns\TextColumn::make('created_at')
+                Tables\Columns\TextColumn::make('transaction.created_at')
                     ->label('Tanggal')
                     ->dateTime('d M Y H:i'),
 
-                Tables\Columns\TextColumn::make('transaction_code')
-                    ->label('Kode Transaksi')
+                Tables\Columns\TextColumn::make('transaction.transaction_code')
+                    ->label('Nomor Nota')
                     ->searchable(),
 
-                Tables\Columns\TextColumn::make('customer_name')
-                    ->label('Customer'),
+                Tables\Columns\TextColumn::make('currency_code')
+                    ->label('Mata Uang'),
 
-                Tables\Columns\TextColumn::make('grand_total')
-                    ->label('Total')
+                Tables\Columns\TextColumn::make('qty')
+                    ->label('Jumlah UKA')
+                    ->numeric(2),
+
+                Tables\Columns\TextColumn::make('buy_rate')
+                    ->label('Rate/Kurs')
                     ->money('IDR', true),
-            ]);
+
+                Tables\Columns\TextColumn::make('total')
+                    ->label('Jumlah Rupiah')
+                    ->money('IDR', true),
+
+                Tables\Columns\TextColumn::make('transaction.customer_name')
+                    ->label('Nama Nasabah')
+                    ->searchable(),
+
+                Tables\Columns\TextColumn::make('transaction.customer_address')
+                    ->label('Alamat')
+                    ->limit(30),
+
+                Tables\Columns\TextColumn::make('transaction.passport_number')
+                    ->label('Passport/KTP'),
+            ])
+            ->defaultSort('buy_transactions.created_at', 'desc');
     }
 }
