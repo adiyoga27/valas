@@ -63,12 +63,21 @@ class OfficeSetting extends Page implements HasForms
     // ->preserveFilenames(false)
     ->maxSize(2048),
 
-    TextInput::make('cdd_threshold')
-        ->label('Batas Nominal CDD (Rp)')
+    TextInput::make('buy_cdd_threshold')
+        ->label('Batas Nominal CDD Beli (Rp)')
         ->numeric()
         ->nullable()
-        ->placeholder('Contoh: 500000000')
-        ->helperText('Transaksi pembelian di atas nominal ini wajib mengisi formulir CDD. Kosongkan untuk menonaktifkan.'),
+        ->default(200000000)
+        ->placeholder('Contoh: 200000000')
+        ->helperText('Transaksi Beli Mata Uang Asing di atas nominal ini wajib mengisi Formulir Transaksi Tunai (CDD). Isi 0 untuk menyembunyikan formulir CDD.'),
+
+    TextInput::make('sell_cdd_threshold')
+        ->label('Batas Nominal CDD Jual (Rp)')
+        ->numeric()
+        ->nullable()
+        ->default(200000000)
+        ->placeholder('Contoh: 200000000')
+        ->helperText('Transaksi Jual Mata Uang Asing di atas nominal ini wajib mengisi Formulir Transaksi Tunai (CDD). Isi 0 untuk menyembunyikan formulir CDD.'),
         ];
     }
 

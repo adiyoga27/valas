@@ -29,7 +29,7 @@ class CreateSellTransactions extends CreateRecord
 
     protected function cddThreshold(): float
     {
-        return (float) (Office::first()?->cdd_threshold ?? 0);
+        return (float) (Office::first()?->sell_cdd_threshold ?? 0);
     }
 
     protected function calculateGrandTotal(): float

@@ -114,7 +114,7 @@
         <tr>
             <td width="20%" style="vertical-align: middle;">Rata-rata Penghasilan/thn<br>(Jutaan Rupiah)</td>
             <td colspan="4">
-                {{ $cdd->penghasilan_tahun ? 'Rp ' . number_format($cdd->penghasilan_tahun, 0, ',', '.') : '' }}
+                {{ $cdd->penghasilan_tahun ? 'Rp ' . number_format((float) $cdd->penghasilan_tahun, 0, ',', '.') : '' }}
             </td>
         </tr>
         <tr>
@@ -203,7 +203,7 @@
             <td colspan="3" class="section-title">DATA TRANSAKSI TUNAI (WAJIB DIISI OLEH NASABAH)</td>
         </tr>
         <tr>
-            <td colspan="3"><strong>Total Jumlah Dana Tunai :</strong> {{ $cdd->total_dana_tunai ? 'Rp ' . number_format($cdd->total_dana_tunai, 0, ',', '.') : '' }}</td>
+            <td colspan="3"><strong>Total Jumlah Dana Tunai :</strong> {{ $cdd->total_dana_tunai ? 'Rp ' . number_format((float) $cdd->total_dana_tunai, 0, ',', '.') : '' }}</td>
         </tr>
         <tr>
             <td width="33%">

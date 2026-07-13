@@ -29,8 +29,13 @@ class OfficeForm
                     ->directory('office-logo')
                     ->maxSize(2048),
 
-                TextInput::make('cdd_threshold')
-                    ->label('Batas CDD (Rp)')
+                TextInput::make('buy_cdd_threshold')
+                    ->label('Batas CDD Beli (Rp)')
+                    ->numeric()
+                    ->nullable(),
+
+                TextInput::make('sell_cdd_threshold')
+                    ->label('Batas CDD Jual (Rp)')
                     ->numeric()
                     ->nullable(),
             ]);

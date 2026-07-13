@@ -12,6 +12,8 @@ class Office extends Model
         'phone',
         'logo',
         'cdd_threshold',
+        'buy_cdd_threshold',
+        'sell_cdd_threshold',
     ];
 
     use \Spatie\Activitylog\Traits\LogsActivity;
