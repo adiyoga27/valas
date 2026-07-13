@@ -126,7 +126,7 @@ class CreateBuyTransaction extends CreateRecord
         return Action::make('cddModal')
             ->label('Isi Formulir CDD')
             ->modalHeading('Formulir Transaksi Tunai (CDD)')
-            ->modalDescription('Deteksi customer batas threshold 25.000 USD per bulan')
+            ->modalDescription('Deteksi customer batas threshold 10.000 USD per bulan')
             ->modalSubmitActionLabel('Simpan & Lanjutkan')
             ->modalCancelActionLabel('Batal')
             ->modalWidth('3xl')
